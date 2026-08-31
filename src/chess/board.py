@@ -34,9 +34,6 @@ class Board:
         moves: list[tuple[int, int]] = piece.get_moves(line, column)
         forbidden_offset: list[tuple[int, int]] = []
 
-        if isinstance(piece, Pawn) and piece.has_moved:
-            moves.pop(1)
-
         for move in moves:
             offset_move: tuple[int, int] = ((move[0] - line > 0) - (move[0] - line < 0), (move[1] - column > 0) - (move[1] - column < 0))
             if offset_move in forbidden_offset and not isinstance(piece, Knight):
