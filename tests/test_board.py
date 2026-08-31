@@ -242,12 +242,48 @@ def test_board_get_possible_moves_king_friendly_piece(empty_board: Board):
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le roi avec une pièce amie sont incorrects."
 
 @pytest.mark.parametrize("line, column, expected_moves", [
-    (1, 0, [(2, 0), (3, 0)])
+    (1, 0, [(2, 0), (3, 0)]),
+    (1, 4, [(2, 4), (3, 4)]),
+    (6, 2, [(5, 2), (4, 2)]),
+    (6, 7, [(5, 7), (4, 7)])
 ])
 def test_board_get_possible_moves_pawn(initial_board_configuration: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
     possible_moves: list[Case] = initial_board_configuration.get_possible_moves(line, column)
     expected_move_cases: list[Case] = [initial_board_configuration.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_move_cases, "Les mouvements possibles pour le pion sont incorrects"
+
+def test_board_get_possible_moves_pawn_ennemy_blocking(empty_board: Board):
+    white_pawn: Pawn = Pawn(PieceColor.WHITE)
+    black_pawn: Pawn = Pawn(PieceColor.BLACK)
+    empty_board.grid[3][4].content = white_pawn
+    empty_board.grid[4][4].content = black_pawn
+    white_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(3, 4)
+    black_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(4, 4)
+    assert white_pawn_possible_moves == []
+    assert black_pawn_possible_moves == []
+
+def test_board_get_possible_moves_pawn_ennemy_capture(empty_board: Board):
+    white_pawn: Pawn = Pawn(PieceColor.WHITE)
+    black_pawn: Pawn = Pawn(PieceColor.BLACK)
+    white_pawn.has_moved = True
+    black_pawn.has_moved = True
+    empty_board.grid[3][4].content = white_pawn
+    empty_board.grid[4][3].content = black_pawn
+    white_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(3, 4)
+    black_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(4, 3)
+    assert white_pawn_possible_moves == [empty_board.grid[4][4], empty_board.grid[4][3]]
+    assert black_pawn_possible_moves == [empty_board.grid[3][3], empty_board.grid[3][4]]
+
+def test_board_get_possible_moves_pawn_ally_blocking(empty_board: Board):
+    white_pawn: Pawn = Pawn(PieceColor.WHITE)
+    second_white_pawn: Pawn = Pawn(PieceColor.WHITE)
+    second_white_pawn.has_moved = True
+    empty_board.grid[3][4].content = white_pawn
+    empty_board.grid[4][4].content = second_white_pawn
+    white_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(3, 4)
+    second_white_pawn_possible_moves: list[Case] = empty_board.get_possible_moves(4, 4)
+    assert white_pawn_possible_moves == []
+    assert second_white_pawn_possible_moves == [empty_board.grid[5][4]]
 
 @pytest.mark.parametrize("line, column", [(3, 3), (4, 4), (5, 5)])
 def test_board_get_possible_moves_empty_case(board_without_pawn: Board, line: int, column: int):
