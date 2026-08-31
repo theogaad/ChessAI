@@ -34,20 +34,28 @@ class Board:
         moves: list[tuple[int, int]] = piece.get_moves(line, column)
         forbidden_offset: list[tuple[int, int]] = []
 
+        if isinstance(piece, Pawn) and piece.has_moved:
+            moves.pop(1)
+
         for move in moves:
             offset_move: tuple[int, int] = ((move[0] - line > 0) - (move[0] - line < 0), (move[1] - column > 0) - (move[1] - column < 0))
             if offset_move in forbidden_offset and not isinstance(piece, Knight):
                 continue
             move_case: Case = self.grid[move[0]][move[1]]
 
-            if isinstance(piece, Pawn):
-                pass
-
             if move_case.content is not None:
                 move_piece: Piece = move_case.content
-                if move_piece.piece_color == piece.piece_color:
+                if isinstance(piece, Pawn):
+                    if abs(offset_move[0]) == abs(offset_move[1]) and move_piece.piece_color == piece.piece_color:
+                        continue
+                    elif abs(offset_move[0]) != abs(offset_move[1]):
+                        forbidden_offset.append(offset_move)
+                        continue
+                elif move_piece.piece_color == piece.piece_color:
                     forbidden_offset.append(offset_move)
                     continue
                 forbidden_offset.append(offset_move)
+            elif isinstance(piece, Pawn) and move_case.content is None and abs(offset_move[0]) == abs(offset_move[1]):
+                continue
             possible_moves.append(move_case)
         return possible_moves

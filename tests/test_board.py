@@ -241,6 +241,14 @@ def test_board_get_possible_moves_king_friendly_piece(empty_board: Board):
     expected_moves_case: list[Case] = [empty_board.grid[1][4], empty_board.grid[0][5], empty_board.grid[0][3], empty_board.grid[1][3]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le roi avec une pièce amie sont incorrects."
 
+@pytest.mark.parametrize("line, column, expected_moves", [
+    (1, 0, [(2, 0), (3, 0)])
+])
+def test_board_get_possible_moves_pawn(initial_board_configuration: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+    possible_moves: list[Case] = initial_board_configuration.get_possible_moves(line, column)
+    expected_move_cases: list[Case] = [initial_board_configuration.grid[move[0]][move[1]] for move in expected_moves]
+    assert possible_moves == expected_move_cases, "Les mouvements possibles pour le pion sont incorrects"
+
 @pytest.mark.parametrize("line, column", [(3, 3), (4, 4), (5, 5)])
 def test_board_get_possible_moves_empty_case(board_without_pawn: Board, line: int, column: int):
     assert board_without_pawn.get_possible_moves(line, column) == []
