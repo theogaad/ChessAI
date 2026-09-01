@@ -1,5 +1,7 @@
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.case import Case
+from src.chess.move import Move
+from src.chess.player import Player
 from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
@@ -72,3 +74,31 @@ class Board:
                 continue
             possible_moves.append(move_case)
         return possible_moves
+
+    def get_color_every_possible_moves(self, color: PieceColor) -> list[Case]:
+        every_possible_moves: list[Case] = []
+        for line in self.grid:
+            for case in line:
+                if case.content is not None and case.content.piece_color == color:
+                    for move in self.get_possible_moves(case.line, case.column):
+                        every_possible_moves.append(move)
+        return every_possible_moves
+
+    def get_king_case(self, king_color: PieceColor) -> Case:
+        for line in self.grid:
+            for case in line:
+                if isinstance(case.content, King) and case.content.piece_color == king_color:
+                    return case
+        raise Exception("Roi manquant")
+
+    def is_checked(self, player: Player) -> bool:
+            is_checked: bool = False
+            king_case: Case = self.get_king_case(player.color)
+            every_possible_moves = self.get_color_every_possible_moves(PieceColor.WHITE if player.color == PieceColor.BLACK else PieceColor.BLACK)
+            if king_case in every_possible_moves:
+                is_checked = True
+            return is_checked
+
+    def apply_move(self, move: Move) -> None:
+        move.end.content = move.start.content
+        move.start.content = None
