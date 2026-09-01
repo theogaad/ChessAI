@@ -17,16 +17,7 @@ def empty_board() -> Board:
 @pytest.fixture
 def initial_board_configuration() -> Board:
     board = Board()
-    initial_configuration: list[list[Piece|None]] = \
-        [[Rook(PieceColor.WHITE), Knight(PieceColor.WHITE), Bishop(PieceColor.WHITE), Queen(PieceColor.WHITE), King(PieceColor.WHITE), Bishop(PieceColor.WHITE), Knight(PieceColor.WHITE), Rook(PieceColor.WHITE)],
-        [Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
-        [None for _ in range(BOARD_SIZE)],
-        [None for _ in range(BOARD_SIZE)],
-        [None for _ in range(BOARD_SIZE)],
-        [None for _ in range(BOARD_SIZE)],
-        [Pawn(PieceColor.BLACK) for _ in range(BOARD_SIZE)],
-        [Rook(PieceColor.BLACK), Knight(PieceColor.BLACK), Bishop(PieceColor.BLACK), Queen(PieceColor.BLACK), King(PieceColor.BLACK), Bishop(PieceColor.BLACK), Knight(PieceColor.BLACK), Rook(PieceColor.BLACK)]]
-    board.fill(initial_configuration)
+    board.create_initial_board()
     return board
 
 @pytest.fixture
