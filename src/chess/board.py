@@ -1,8 +1,12 @@
-from src.chess.pieces.piece import Piece
+from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.case import Case
 from src.chess.constants import BOARD_SIZE
+from src.chess.pieces.bishop import Bishop
+from src.chess.pieces.king import King
 from src.chess.pieces.knight import Knight
 from src.chess.pieces.pawn import Pawn
+from src.chess.pieces.queen import Queen
+from src.chess.pieces.rook import Rook
 
 # Classe représentant un plateau d'échecs, contenant une grille (8x8) de cases
 class Board:
@@ -23,6 +27,18 @@ class Board:
                     self.grid[i][j].content = piece
                 else:
                     self.grid[i][j].content = None
+
+    def create_initial_board(self) -> None:
+        initial_configuration: list[list[Piece|None]] = \
+            [[Rook(PieceColor.WHITE), Knight(PieceColor.WHITE), Bishop(PieceColor.WHITE), Queen(PieceColor.WHITE), King(PieceColor.WHITE), Bishop(PieceColor.WHITE), Knight(PieceColor.WHITE), Rook(PieceColor.WHITE)],
+            [Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
+            [None for _ in range(BOARD_SIZE)],
+            [None for _ in range(BOARD_SIZE)],
+            [None for _ in range(BOARD_SIZE)],
+            [None for _ in range(BOARD_SIZE)],
+            [Pawn(PieceColor.BLACK) for _ in range(BOARD_SIZE)],
+            [Rook(PieceColor.BLACK), Knight(PieceColor.BLACK), Bishop(PieceColor.BLACK), Queen(PieceColor.BLACK), King(PieceColor.BLACK), Bishop(PieceColor.BLACK), Knight(PieceColor.BLACK), Rook(PieceColor.BLACK)]]
+        self.fill(initial_configuration)
 
     def get_possible_moves(self, line: int, column: int) -> list[Case]:
         case: Case = self.grid[line][column]
