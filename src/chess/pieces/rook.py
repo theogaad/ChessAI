@@ -1,5 +1,5 @@
 from src.chess.pieces.piece import Piece, PieceColor
-from src.chess.move_utils import get_sliding_moves
+from src.chess.piece_utils import get_sliding_moves
 
 class Rook(Piece):
     def __init__(self, color: PieceColor):
