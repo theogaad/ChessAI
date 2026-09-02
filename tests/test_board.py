@@ -1,5 +1,8 @@
 from src.chess.board import Board
 from src.chess.case import Case
+from src.chess.player import Player
+from src.chess.profile import Profile
+from src.chess.move import Move
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
@@ -279,3 +282,44 @@ def test_board_get_possible_moves_pawn_ally_blocking(empty_board: Board):
 @pytest.mark.parametrize("line, column", [(3, 3), (4, 4), (5, 5)])
 def test_board_get_possible_moves_empty_case(board_without_pawn: Board, line: int, column: int):
     assert board_without_pawn.get_possible_moves(line, column) == []
+
+@pytest.mark.parametrize("color, expected_moves", [
+    (PieceColor.WHITE, [(2, 2), (2, 0), (2, 7), (2, 5), (2, 0), (3, 0), (2, 1), (3, 1), (2, 2), (3, 2), (2, 3), (3, 3), (2, 4), (3, 4), (2, 5), (3, 5), (2, 6), (3, 6), (2, 7), (3, 7)]),
+    (PieceColor.BLACK, [(5, 0), (4, 0), (5, 1), (4, 1), (5, 2), (4, 2), (5, 3), (4, 3), (5, 4), (4, 4), (5, 5), (4, 5), (5, 6), (4, 6), (5, 7), (4, 7), (5, 2), (5, 0), (5, 7), (5, 5)])
+])
+def test_board_get_color_every_possible_move(initial_board_configuration: Board, color: PieceColor, expected_moves: list[tuple[int, int]]):
+    assert initial_board_configuration.get_color_every_possible_moves(color) == [initial_board_configuration.grid[move[0]][move[1]] for move in expected_moves]
+
+def test_board_get_king_case(empty_board: Board):
+    with pytest.raises(Exception):
+        empty_board.get_king_case(PieceColor.WHITE)
+    with pytest.raises(Exception):
+        empty_board.get_king_case(PieceColor.BLACK)
+    empty_board.grid[2][5].content = King(PieceColor.WHITE)
+    empty_board.grid[5][2].content = King(PieceColor.BLACK)
+    assert empty_board.get_king_case(PieceColor.WHITE) == empty_board.grid[2][5]
+    assert empty_board.get_king_case(PieceColor.BLACK) == empty_board.grid[5][2]
+
+def test_board_is_checked(empty_board: Board):
+    player_white: Player = Player(Profile(), PieceColor.WHITE)
+    player_black: Player = Player(Profile(), PieceColor.BLACK)
+    empty_board.grid[0][0].content = King(PieceColor.WHITE)
+    empty_board.grid[7][7].content = King(PieceColor.BLACK)
+    assert empty_board.is_checked(player_white) == False
+    assert empty_board.is_checked(player_black) == False
+
+    empty_board.grid[1][1].content = Pawn(PieceColor.BLACK)
+    assert empty_board.is_checked(player_white) == True
+    assert empty_board.is_checked(player_black) == False
+
+    empty_board.grid[0][7].content = Rook(PieceColor.WHITE)
+    assert empty_board.is_checked(player_white) == True
+    assert empty_board.is_checked(player_black) == True
+
+def test_board_apply_move(initial_board_configuration: Board):
+    pawn_move: Move = Move(initial_board_configuration.grid[1][0], initial_board_configuration.grid[2][0])
+    if isinstance(initial_board_configuration.grid[1][0].content, Pawn):
+        white_pawn_moving: Pawn = initial_board_configuration.grid[1][0].content
+    initial_board_configuration.apply_move(pawn_move)
+    assert initial_board_configuration.grid[1][0].content == None
+    assert initial_board_configuration.grid[2][0].content == white_pawn_moving
