@@ -1,7 +1,5 @@
 from src.chess.board import Board
 from src.chess.case import Case
-from src.chess.player import Player
-from src.chess.profile import Profile
 from src.chess.move import Move
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.bishop import Bishop
@@ -301,20 +299,18 @@ def test_board_get_king_case(empty_board: Board):
     assert empty_board.get_king_case(PieceColor.BLACK) == empty_board.grid[5][2]
 
 def test_board_is_checked(empty_board: Board):
-    player_white: Player = Player(Profile(), PieceColor.WHITE)
-    player_black: Player = Player(Profile(), PieceColor.BLACK)
     empty_board.grid[0][0].content = King(PieceColor.WHITE)
     empty_board.grid[7][7].content = King(PieceColor.BLACK)
-    assert empty_board.is_checked(player_white) == False
-    assert empty_board.is_checked(player_black) == False
+    assert empty_board.is_checked(PieceColor.WHITE) == False
+    assert empty_board.is_checked(PieceColor.BLACK) == False
 
     empty_board.grid[1][1].content = Pawn(PieceColor.BLACK)
-    assert empty_board.is_checked(player_white) == True
-    assert empty_board.is_checked(player_black) == False
+    assert empty_board.is_checked(PieceColor.WHITE) == True
+    assert empty_board.is_checked(PieceColor.BLACK) == False
 
     empty_board.grid[0][7].content = Rook(PieceColor.WHITE)
-    assert empty_board.is_checked(player_white) == True
-    assert empty_board.is_checked(player_black) == True
+    assert empty_board.is_checked(PieceColor.WHITE) == True
+    assert empty_board.is_checked(PieceColor.BLACK) == True
 
 def test_board_apply_move(initial_board_configuration: Board):
     pawn_move: Move = Move(initial_board_configuration.grid[1][0], initial_board_configuration.grid[2][0])

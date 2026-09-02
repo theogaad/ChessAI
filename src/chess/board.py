@@ -1,7 +1,6 @@
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.case import Case
 from src.chess.move import Move
-from src.chess.player import Player
 from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
@@ -91,10 +90,10 @@ class Board:
                     return case
         raise Exception("Roi manquant")
 
-    def is_checked(self, player: Player) -> bool:
+    def is_checked(self, color: PieceColor) -> bool:
             is_checked: bool = False
-            king_case: Case = self.get_king_case(player.color)
-            every_possible_moves = self.get_color_every_possible_moves(PieceColor.WHITE if player.color == PieceColor.BLACK else PieceColor.BLACK)
+            king_case: Case = self.get_king_case(color)
+            every_possible_moves = self.get_color_every_possible_moves(PieceColor.WHITE if color == PieceColor.BLACK else PieceColor.BLACK)
             if king_case in every_possible_moves:
                 is_checked = True
             return is_checked
