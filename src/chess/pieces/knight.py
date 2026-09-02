@@ -7,6 +7,7 @@ class Knight(Piece):
 
     def get_moves(self, line: int, column: int) -> list[tuple[int, int]]:
         list_of_possible_moves: list[tuple[int, int]] = []
+        # "offset" désigne un mouvement/direction possible de la pièce
         offsets: list[tuple[int, int]] = [(1, 2), (2, 1), (-1, 2), (-2, 1), (1, -2), (2, -1), (-1, -2), (-2, -1)]
         for offset in offsets:
             new_position: tuple[int, int] = (line + offset[0], column + offset[1])

@@ -2,6 +2,7 @@ from src.chess.constants import BOARD_SIZE
 
 def get_sliding_moves(line: int, column: int, offsets: list[tuple[int, int]]) -> list[tuple[int, int]]:
     list_of_possible_moves: list[tuple[int, int]] = []
+    # "offset" désigne un mouvement/direction possible de la pièce
     for offset in offsets:
         i = 1
         while 0 <= line + offset[0] * i < BOARD_SIZE and 0 <= column + offset[1] * i < BOARD_SIZE:

@@ -9,6 +9,7 @@ class Pawn(Piece):
     def get_moves(self, line: int, column: int) -> list[tuple[int, int]]:
         list_of_possible_moves: list[tuple[int, int]] = []
         coeff: int = 1 if self.piece_color == PieceColor.WHITE else -1
+        # "offset" désigne un mouvement/direction possible de la pièce
         offsets: list[tuple[int, int]] = [(1 * coeff, 0), (1 * coeff, 1), (1 * coeff, -1)]
         if not self.has_moved:
             offsets.append((2 * coeff, 0))
