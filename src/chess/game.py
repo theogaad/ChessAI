@@ -1,7 +1,7 @@
 from src.chess.profile import Profile
 from src.chess.player import Player
 from src.chess.board import Board
-from src.chess.move import Move
+from src.chess.move import Move, SpecialMove
 from src.chess.case import Case
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.king import King
@@ -93,6 +93,11 @@ class Game:
         if not move.end in piece_legal_moves:
             raise IllegalMoveError("L'attribut end d'un move doit être une case atteignable par la pièce contenue dans l'attribut start.")
 
+        # Roque
+        if move.special_move == SpecialMove.CASTLING:
+            rook_case: Case = self.board.grid[move.start.line][7 if move.start.column < move.end.column else 0]
+            rook_move: Move = Move(rook_case, self.board.grid[move.start.line][5 if move.start.column < move.end.column else 3])
+            self.board.apply_move(rook_move)
         self.board.apply_move(move)
         self.moves.append(move)
         self.switch_players()

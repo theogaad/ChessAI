@@ -1,7 +1,7 @@
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.case import Case
 from src.chess.move import Move
-from src.chess.constants import BOARD_SIZE
+from src.chess.constants import BOARD_SIZE, INITIAL_BOARD_CONFIG
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
 from src.chess.pieces.knight import Knight
@@ -30,16 +30,7 @@ class Board:
                     self.grid[i][j].content = None
 
     def create_initial_board(self) -> None:
-        initial_configuration: list[list[Piece|None]] = \
-            [[Rook(PieceColor.WHITE), Knight(PieceColor.WHITE), Bishop(PieceColor.WHITE), Queen(PieceColor.WHITE), King(PieceColor.WHITE), Bishop(PieceColor.WHITE), Knight(PieceColor.WHITE), Rook(PieceColor.WHITE)],
-            [Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
-            [None for _ in range(BOARD_SIZE)],
-            [None for _ in range(BOARD_SIZE)],
-            [None for _ in range(BOARD_SIZE)],
-            [None for _ in range(BOARD_SIZE)],
-            [Pawn(PieceColor.BLACK) for _ in range(BOARD_SIZE)],
-            [Rook(PieceColor.BLACK), Knight(PieceColor.BLACK), Bishop(PieceColor.BLACK), Queen(PieceColor.BLACK), King(PieceColor.BLACK), Bishop(PieceColor.BLACK), Knight(PieceColor.BLACK), Rook(PieceColor.BLACK)]]
-        self.fill(initial_configuration)
+        self.fill(INITIAL_BOARD_CONFIG)
 
     def get_possible_moves(self, line: int, column: int) -> list[Case]:
         case: Case = self.grid[line][column]
@@ -112,5 +103,7 @@ class Board:
             return king_case in every_attacked_cases
 
     def apply_move(self, move: Move) -> None:
+        if isinstance(move.start.content, (King, Pawn, Rook)):
+            move.start.content.has_moved = True
         move.end.content = move.start.content
         move.start.content = None
