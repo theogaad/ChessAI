@@ -83,6 +83,21 @@ class Board:
                         every_possible_moves.append(move)
         return every_possible_moves
 
+    def get_attacked_cases(self, color: PieceColor) -> list[Case]:
+        attacked_cases: list[Case] = []
+        for line in range(BOARD_SIZE):
+            for column in range(BOARD_SIZE):
+                case: Case = self.grid[line][column]
+                if isinstance(case.content, Piece) and case.content.piece_color == color:
+                    if isinstance(case.content, Pawn):
+                        pawn_possible_moves: list[tuple[int, int]] = case.content.get_moves(case.line, case.column)
+                        for move in pawn_possible_moves:
+                            if move[1] != case.column:
+                                attacked_cases.append(self.grid[move[0]][move[1]])
+                    else:
+                        attacked_cases.extend(self.get_possible_moves(case.line, case.column))
+        return attacked_cases
+
     def get_king_case(self, king_color: PieceColor) -> Case:
         for line in self.grid:
             for case in line:
@@ -93,8 +108,8 @@ class Board:
     def is_checked(self, color: PieceColor) -> bool:
             is_checked: bool = False
             king_case: Case = self.get_king_case(color)
-            every_possible_moves = self.get_color_every_possible_moves(PieceColor.WHITE if color == PieceColor.BLACK else PieceColor.BLACK)
-            if king_case in every_possible_moves:
+            every_attacked_cases: list[Case] = self.get_attacked_cases(PieceColor.WHITE if color == PieceColor.BLACK else PieceColor.BLACK)
+            if king_case in every_attacked_cases:
                 is_checked = True
             return is_checked
 
