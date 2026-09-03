@@ -4,6 +4,7 @@ from src.chess.constants import BOARD_SIZE
 class King(Piece):
     def __init__(self, color: PieceColor):
         super().__init__(color)
+        self.has_moved = False
 
     def get_moves(self, line: int, column: int) -> list[tuple[int, int]]:
         list_of_possible_moves: list[tuple[int, int]] = []
