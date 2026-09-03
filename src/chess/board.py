@@ -109,9 +109,7 @@ class Board:
             is_checked: bool = False
             king_case: Case = self.get_king_case(color)
             every_attacked_cases: list[Case] = self.get_attacked_cases(PieceColor.WHITE if color == PieceColor.BLACK else PieceColor.BLACK)
-            if king_case in every_attacked_cases:
-                is_checked = True
-            return is_checked
+            return king_case in every_attacked_cases
 
     def apply_move(self, move: Move) -> None:
         move.end.content = move.start.content
