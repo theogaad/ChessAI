@@ -1,5 +1,5 @@
 import pytest
-from src.chess.pieces.piece import Piece, PieceColor
+from src.chess.pieces.piece import PieceColor
 from src.chess.pieces.rook import Rook
 
 @pytest.fixture
@@ -10,6 +10,7 @@ def white_rook():
 def test_rook_creation(piece_color: PieceColor):
     rook = Rook(piece_color)
     assert rook.piece_color == piece_color
+    assert rook.has_moved == False
 
 @pytest.mark.parametrize("piece_color", ["test_wrong_color", 12345678, False])
 def test_rook_wrong_creation(piece_color):

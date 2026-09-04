@@ -1,10 +1,5 @@
-from src.chess.pieces.piece import Piece, PieceColor
-from src.chess.pieces.bishop import Bishop
+from src.chess.pieces.piece import PieceColor
 from src.chess.pieces.king import King
-from src.chess.pieces.knight import Knight
-from src.chess.pieces.pawn import Pawn
-from src.chess.pieces.queen import Queen
-from src.chess.pieces.rook import Rook
 import pytest
 
 def test_piece_creation_white_king():

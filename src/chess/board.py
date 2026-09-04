@@ -97,7 +97,6 @@ class Board:
         raise Exception("Roi manquant")
 
     def is_checked(self, color: PieceColor) -> bool:
-            is_checked: bool = False
             king_case: Case = self.get_king_case(color)
             every_attacked_cases: list[Case] = self.get_attacked_cases(PieceColor.WHITE if color == PieceColor.BLACK else PieceColor.BLACK)
             return king_case in every_attacked_cases

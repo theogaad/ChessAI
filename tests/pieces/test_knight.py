@@ -1,5 +1,5 @@
 import pytest
-from src.chess.pieces.piece import Piece, PieceColor
+from src.chess.pieces.piece import PieceColor
 from src.chess.pieces.knight import Knight
 
 @pytest.fixture
