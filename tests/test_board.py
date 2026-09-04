@@ -36,7 +36,7 @@ def board_without_pawn() -> Board:
     board.fill(initial_configuration)
     return board
 
-def test_board_creation(empty_board: Board):
+def test_board_creation(empty_board: Board) -> None:
     assert len(empty_board.grid) == BOARD_SIZE, f"Le plateau doit avoir {BOARD_SIZE} lignes."
     for row in empty_board.grid:
         assert len(row) == BOARD_SIZE, f"Chaque ligne du plateau doit avoir {BOARD_SIZE} colonnes."
@@ -44,7 +44,7 @@ def test_board_creation(empty_board: Board):
             assert isinstance(case, Case), "Chaque élément du plateau doit être une instance de Case."
             assert case.content is None, "Chaque case doit être initialement vide (content = None)."
 
-def test_board_fill(empty_board: Board):
+def test_board_fill(empty_board: Board) -> None:
     pieces: list[list[Piece | None]] = [[Rook(PieceColor.WHITE) for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
     empty_board.fill(pieces)
     for i in range(BOARD_SIZE):
@@ -53,7 +53,7 @@ def test_board_fill(empty_board: Board):
             assert isinstance(piece, Piece), "Chaque élément du plateau doit être une instance de Piece."
             assert piece.piece_color == PieceColor.WHITE, "La pièce doit être blanche."
 
-def test_board_fill_invalid_size(empty_board: Board):
+def test_board_fill_invalid_size(empty_board: Board) -> None:
     invalid_pieces: list[list[Piece | None]] = [[Rook(PieceColor.WHITE) for _ in range(BOARD_SIZE - 1)] for _ in range(BOARD_SIZE)]
     with pytest.raises(ValueError):
         empty_board.fill(invalid_pieces)
@@ -62,14 +62,14 @@ def test_board_fill_invalid_size(empty_board: Board):
     with pytest.raises(ValueError):
         empty_board.fill(invalid_pieces)
 
-def test_board_fill_with_none(empty_board: Board):
+def test_board_fill_with_none(empty_board: Board) -> None:
     pieces: list[list[Piece | None]] = [[None for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
     empty_board.fill(pieces)
     for i in range(BOARD_SIZE):
         for j in range(BOARD_SIZE):
             assert empty_board.grid[i][j].content is None
 
-def test_board_fill_initial_configuration_count(initial_board_configuration: Board):
+def test_board_fill_initial_configuration_count(initial_board_configuration: Board) -> None:
     count_pieces = sum(1 for row in initial_board_configuration.grid for case in row if isinstance(case.content, Piece))
     count_none = sum(1 for row in initial_board_configuration.grid for case in row if case.content is None)
     count_white_pieces = sum(1 for row in initial_board_configuration.grid for case in row if isinstance(case.content, Piece) and case.content.piece_color == PieceColor.WHITE)
@@ -87,7 +87,7 @@ def test_board_fill_initial_configuration_count(initial_board_configuration: Boa
     (7, 4, King, PieceColor.BLACK),
     (7, 0, Rook, PieceColor.BLACK)
 ])
-def test_board_fill_initial_configuration_content(initial_board_configuration: Board, line: int, column: int, expected_piece_type: type[Piece], expected_piece_color: PieceColor):
+def test_board_fill_initial_configuration_content(initial_board_configuration: Board, line: int, column: int, expected_piece_type: type[Piece], expected_piece_color: PieceColor) -> None:
     piece = initial_board_configuration.grid[line][column].content
     assert isinstance(piece, expected_piece_type), "Le type de la pièce est incorrect."
     assert piece.piece_color == expected_piece_color, "La couleur de la pièce est incorrecte."
@@ -100,7 +100,7 @@ def test_board_fill_initial_configuration_content(initial_board_configuration: B
     (7, 4, type(None)),
     (7, 0, type(None))
 ])
-def test_board_fill_overwrite_existing_content(initial_board_configuration: Board, line: int, column: int, expected_type: type):
+def test_board_fill_overwrite_existing_content(initial_board_configuration: Board, line: int, column: int, expected_type: type) -> None:
     new_board_configuration: list[list[Piece | None]] = \
         [[None for _ in range(BOARD_SIZE)],
         [Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
@@ -118,19 +118,19 @@ def test_board_fill_overwrite_existing_content(initial_board_configuration: Boar
     (0, 1, [(1, 3), (2, 2), (2, 0)]),
     (7, 1, [(6, 3), (5, 2), (5, 0)])
 ])
-def test_board_get_possible_moves_knight(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_knight(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     possible_moves: list[Case] = board_without_pawn.get_possible_moves(line, column)
     expected_moves_case: list[Case] = [board_without_pawn.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le cavalier sont incorrects."
 
-def test_board_get_possible_moves_knight_ennemy_piece(empty_board: Board):
+def test_board_get_possible_moves_knight_ennemy_piece(empty_board: Board) -> None:
     empty_board.grid[4][4].content = Knight(PieceColor.WHITE)
     empty_board.grid[5][6].content = Pawn(PieceColor.BLACK)
     possible_moves: list[Case] = empty_board.get_possible_moves(4, 4)
     expected_moves_case: list[Case] = [empty_board.grid[5][6], empty_board.grid[6][5], empty_board.grid[3][6], empty_board.grid[2][5], empty_board.grid[5][2], empty_board.grid[6][3], empty_board.grid[3][2], empty_board.grid[2][3]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le cavalier avec une pièce ennemie sont incorrects."
 
-def test_board_get_possible_moves_knight_friendly_piece(empty_board: Board):
+def test_board_get_possible_moves_knight_friendly_piece(empty_board: Board) -> None:
     empty_board.grid[4][4].content = Knight(PieceColor.WHITE)
     empty_board.grid[5][6].content = Pawn(PieceColor.WHITE)
     possible_moves: list[Case] = empty_board.get_possible_moves(4, 4)
@@ -141,20 +141,20 @@ def test_board_get_possible_moves_knight_friendly_piece(empty_board: Board):
     (0, 0, [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)]),
     (7, 0, [(6, 0), (5, 0), (4, 0), (3, 0), (2, 0), (1, 0), (0, 0)])
 ])
-def test_board_get_possible_moves_rook(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_rook(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     # Test possible moves for a white rook at (0, 0)
     possible_moves = board_without_pawn.get_possible_moves(line, column)
     expected_moves_case = [board_without_pawn.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour la tour sont incorrects."
 
-def test_board_get_possible_moves_rook_ennemy_piece(empty_board: Board):
+def test_board_get_possible_moves_rook_ennemy_piece(empty_board: Board) -> None:
     empty_board.grid[0][0].content = Rook(PieceColor.WHITE)
     empty_board.grid[0][3].content = Pawn(PieceColor.BLACK)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 0)
     expected_moves_case: list[Case] = [empty_board.grid[1][0], empty_board.grid[2][0], empty_board.grid[3][0], empty_board.grid[4][0], empty_board.grid[5][0], empty_board.grid[6][0], empty_board.grid[7][0], empty_board.grid[0][1], empty_board.grid[0][2], empty_board.grid[0][3]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour la tour avec une pièce ennemie sont incorrects."
 
-def test_board_get_possible_moves_rook_friendly_piece(empty_board: Board):
+def test_board_get_possible_moves_rook_friendly_piece(empty_board: Board) -> None:
     empty_board.grid[0][0].content = Rook(PieceColor.WHITE)
     empty_board.grid[0][3].content = Pawn(PieceColor.WHITE)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 0)
@@ -165,20 +165,20 @@ def test_board_get_possible_moves_rook_friendly_piece(empty_board: Board):
     (0, 2, [(1, 3), (2, 4), (3, 5), (4, 6), (5, 7), (1, 1), (2, 0)]),
     (7, 2, [(6, 3), (5, 4), (4, 5), (3, 6), (2, 7), (6, 1), (5, 0)])
 ])
-def test_board_get_possible_moves_bishop(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_bishop(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     # Test possible moves for a white bishop at (0, 2)
     possible_moves = board_without_pawn.get_possible_moves(line, column)
     expected_moves_case = [board_without_pawn.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le fou sont incorrects."
 
-def test_board_get_possible_moves_bishop_ennemy_piece(empty_board: Board):
+def test_board_get_possible_moves_bishop_ennemy_piece(empty_board: Board) -> None:
     empty_board.grid[0][2].content = Bishop(PieceColor.WHITE)
     empty_board.grid[3][5].content = Pawn(PieceColor.BLACK)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 2)
     expected_moves_case: list[Case] = [empty_board.grid[1][3], empty_board.grid[2][4], empty_board.grid[3][5], empty_board.grid[1][1], empty_board.grid[2][0]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le fou avec une pièce ennemie sont incorrects."
 
-def test_board_get_possible_moves_bishop_friendly_piece(empty_board: Board):
+def test_board_get_possible_moves_bishop_friendly_piece(empty_board: Board) -> None:
     empty_board.grid[0][2].content = Bishop(PieceColor.WHITE)
     empty_board.grid[3][5].content = Pawn(PieceColor.WHITE)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 2)
@@ -189,20 +189,20 @@ def test_board_get_possible_moves_bishop_friendly_piece(empty_board: Board):
     (0, 3, [(1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3), (1, 4), (2, 5), (3, 6), (4, 7), (1, 2), (2, 1), (3, 0)]),
     (7, 3, [(6, 3), (5, 3), (4, 3), (3, 3), (2, 3), (1, 3), (0, 3), (6, 4), (5, 5), (4, 6), (3, 7), (6, 2), (5, 1), (4, 0)])
 ])
-def test_board_get_possible_moves_queen(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_queen(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     # Test possible moves for a white queen at (0, 3)
     possible_moves = board_without_pawn.get_possible_moves(line, column)
     expected_moves_case = [board_without_pawn.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour la reine sont incorrects."
 
-def test_board_get_possible_moves_queen_ennemy_piece(empty_board: Board):
+def test_board_get_possible_moves_queen_ennemy_piece(empty_board: Board) -> None:
     empty_board.grid[0][3].content = Queen(PieceColor.WHITE)
     empty_board.grid[3][6].content = Pawn(PieceColor.BLACK)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 3)
     expected_moves_case: list[Case] = [empty_board.grid[1][3], empty_board.grid[2][3], empty_board.grid[3][3], empty_board.grid[4][3], empty_board.grid[5][3], empty_board.grid[6][3], empty_board.grid[7][3], empty_board.grid[0][4], empty_board.grid[0][5], empty_board.grid[0][6], empty_board.grid[0][7], empty_board.grid[0][2], empty_board.grid[0][1], empty_board.grid[0][0], empty_board.grid[1][4], empty_board.grid[2][5], empty_board.grid[3][6], empty_board.grid[1][2], empty_board.grid[2][1], empty_board.grid[3][0]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour la reine avec une pièce ennemie sont incorrects."
 
-def test_board_get_possible_moves_queen_friendly_piece(empty_board: Board):
+def test_board_get_possible_moves_queen_friendly_piece(empty_board: Board) -> None:
     empty_board.grid[0][3].content = Queen(PieceColor.WHITE)
     empty_board.grid[3][6].content = Pawn(PieceColor.WHITE)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 3)
@@ -213,20 +213,20 @@ def test_board_get_possible_moves_queen_friendly_piece(empty_board: Board):
     (0, 4, [(1, 4), (1, 5), (1, 3)]),
     (7, 4, [(6, 5), (6, 4), (6, 3)])
 ])
-def test_board_get_possible_moves_king(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_king(board_without_pawn: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     # Test possible moves for a white king at (0, 4)
     possible_moves = board_without_pawn.get_possible_moves(line, column)
     expected_moves_case = [board_without_pawn.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le roi sont incorrects."
 
-def test_board_get_possible_moves_king_ennemy_piece(empty_board: Board):
+def test_board_get_possible_moves_king_ennemy_piece(empty_board: Board) -> None:
     empty_board.grid[0][4].content = King(PieceColor.WHITE)
     empty_board.grid[1][5].content = Pawn(PieceColor.BLACK)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 4)
     expected_moves_case: list[Case] = [empty_board.grid[1][4], empty_board.grid[1][5], empty_board.grid[0][5], empty_board.grid[0][3], empty_board.grid[1][3]]
     assert possible_moves == expected_moves_case, "Les mouvements possibles pour le roi avec une pièce ennemie sont incorrects."
 
-def test_board_get_possible_moves_king_friendly_piece(empty_board: Board):
+def test_board_get_possible_moves_king_friendly_piece(empty_board: Board) -> None:
     empty_board.grid[0][4].content = King(PieceColor.WHITE)
     empty_board.grid[1][5].content = Pawn(PieceColor.WHITE)
     possible_moves: list[Case] = empty_board.get_possible_moves(0, 4)
@@ -239,12 +239,12 @@ def test_board_get_possible_moves_king_friendly_piece(empty_board: Board):
     (6, 2, [(5, 2), (4, 2)]),
     (6, 7, [(5, 7), (4, 7)])
 ])
-def test_board_get_possible_moves_pawn(initial_board_configuration: Board, line: int, column: int, expected_moves: list[tuple[int, int]]):
+def test_board_get_possible_moves_pawn(initial_board_configuration: Board, line: int, column: int, expected_moves: list[tuple[int, int]]) -> None:
     possible_moves: list[Case] = initial_board_configuration.get_possible_moves(line, column)
     expected_move_cases: list[Case] = [initial_board_configuration.grid[move[0]][move[1]] for move in expected_moves]
     assert possible_moves == expected_move_cases, "Les mouvements possibles pour le pion sont incorrects"
 
-def test_board_get_possible_moves_pawn_ennemy_blocking(empty_board: Board):
+def test_board_get_possible_moves_pawn_ennemy_blocking(empty_board: Board) -> None:
     white_pawn: Pawn = Pawn(PieceColor.WHITE)
     black_pawn: Pawn = Pawn(PieceColor.BLACK)
     empty_board.grid[3][4].content = white_pawn
@@ -254,7 +254,7 @@ def test_board_get_possible_moves_pawn_ennemy_blocking(empty_board: Board):
     assert white_pawn_possible_moves == []
     assert black_pawn_possible_moves == []
 
-def test_board_get_possible_moves_pawn_ennemy_capture(empty_board: Board):
+def test_board_get_possible_moves_pawn_ennemy_capture(empty_board: Board) -> None:
     white_pawn: Pawn = Pawn(PieceColor.WHITE)
     black_pawn: Pawn = Pawn(PieceColor.BLACK)
     white_pawn.has_moved = True
@@ -266,7 +266,7 @@ def test_board_get_possible_moves_pawn_ennemy_capture(empty_board: Board):
     assert white_pawn_possible_moves == [empty_board.grid[4][4], empty_board.grid[4][3]]
     assert black_pawn_possible_moves == [empty_board.grid[3][3], empty_board.grid[3][4]]
 
-def test_board_get_possible_moves_pawn_ally_blocking(empty_board: Board):
+def test_board_get_possible_moves_pawn_ally_blocking(empty_board: Board) -> None:
     white_pawn: Pawn = Pawn(PieceColor.WHITE)
     second_white_pawn: Pawn = Pawn(PieceColor.WHITE)
     second_white_pawn.has_moved = True
@@ -278,17 +278,17 @@ def test_board_get_possible_moves_pawn_ally_blocking(empty_board: Board):
     assert second_white_pawn_possible_moves == [empty_board.grid[5][4]]
 
 @pytest.mark.parametrize("line, column", [(3, 3), (4, 4), (5, 5)])
-def test_board_get_possible_moves_empty_case(board_without_pawn: Board, line: int, column: int):
+def test_board_get_possible_moves_empty_case(board_without_pawn: Board, line: int, column: int) -> None:
     assert board_without_pawn.get_possible_moves(line, column) == []
 
 @pytest.mark.parametrize("color, expected_moves", [
     (PieceColor.WHITE, [(2, 2), (2, 0), (2, 7), (2, 5), (2, 0), (3, 0), (2, 1), (3, 1), (2, 2), (3, 2), (2, 3), (3, 3), (2, 4), (3, 4), (2, 5), (3, 5), (2, 6), (3, 6), (2, 7), (3, 7)]),
     (PieceColor.BLACK, [(5, 0), (4, 0), (5, 1), (4, 1), (5, 2), (4, 2), (5, 3), (4, 3), (5, 4), (4, 4), (5, 5), (4, 5), (5, 6), (4, 6), (5, 7), (4, 7), (5, 2), (5, 0), (5, 7), (5, 5)])
 ])
-def test_board_get_color_every_possible_move(initial_board_configuration: Board, color: PieceColor, expected_moves: list[tuple[int, int]]):
+def test_board_get_color_every_possible_move(initial_board_configuration: Board, color: PieceColor, expected_moves: list[tuple[int, int]]) -> None:
     assert initial_board_configuration.get_color_every_possible_moves(color) == [initial_board_configuration.grid[move[0]][move[1]] for move in expected_moves]
 
-def test_board_get_king_case(empty_board: Board):
+def test_board_get_king_case(empty_board: Board) -> None:
     with pytest.raises(Exception):
         empty_board.get_king_case(PieceColor.WHITE)
     with pytest.raises(Exception):
@@ -298,7 +298,7 @@ def test_board_get_king_case(empty_board: Board):
     assert empty_board.get_king_case(PieceColor.WHITE) == empty_board.grid[2][5]
     assert empty_board.get_king_case(PieceColor.BLACK) == empty_board.grid[5][2]
 
-def test_board_is_checked(empty_board: Board):
+def test_board_is_checked(empty_board: Board) -> None:
     empty_board.grid[0][0].content = King(PieceColor.WHITE)
     empty_board.grid[7][7].content = King(PieceColor.BLACK)
     assert empty_board.is_checked(PieceColor.WHITE) == False
@@ -312,7 +312,7 @@ def test_board_is_checked(empty_board: Board):
     assert empty_board.is_checked(PieceColor.WHITE) == True
     assert empty_board.is_checked(PieceColor.BLACK) == True
 
-def test_board_apply_move(initial_board_configuration: Board):
+def test_board_apply_move(initial_board_configuration: Board) -> None:
     pawn_move: Move = Move(initial_board_configuration.grid[1][0], initial_board_configuration.grid[2][0])
     if isinstance(initial_board_configuration.grid[1][0].content, Pawn):
         white_pawn_moving: Pawn = initial_board_configuration.grid[1][0].content

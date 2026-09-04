@@ -11,8 +11,8 @@ def player_white() -> Player:
 def player_black() -> Player:
     return Player(Profile(), PieceColor.BLACK)
 
-def test_player_white(player_white: Player):
+def test_player_white(player_white: Player) -> None:
     assert player_white.color == PieceColor.WHITE
 
-def test_player_black(player_black: Player):
+def test_player_black(player_black: Player) -> None:
     assert player_black.color == PieceColor.BLACK

@@ -31,13 +31,16 @@ class Game:
     def switch_players(self) -> None:
         self.current_player = self.players[1] if self.current_player == self.players[0] else self.players[0]
 
-    def get_legal_moves(self, line: int, column: int, color: PieceColor) -> list[Case]:
+    def get_legal_moves(self, line: int, column: int) -> list[Case]:
+        case_content = self.board.grid[line][column].content
+        if case_content is None:
+            return []
         legal_moves: list[Case] = []
         possible_moves: list[Case] = self.board.get_possible_moves(line, column)
         for case in possible_moves:
             board_after_move: Board = deepcopy(self.board)
             board_after_move.apply_move(Move(board_after_move.grid[line][column], board_after_move.grid[case.line][case.column]))
-            if board_after_move.is_checked(color):
+            if board_after_move.is_checked(case_content.piece_color):
                 continue
             legal_moves.append(case)
             legal_moves.extend(self.get_castling_moves(line, column))
@@ -76,7 +79,7 @@ class Game:
             for j in range(BOARD_SIZE):
                 case: Case = self.board.grid[i][j]
                 if isinstance(case.content, Piece) and case.content.piece_color == color:
-                    piece_legal_moves: list[Case] = self.get_legal_moves(i, j, color)
+                    piece_legal_moves: list[Case] = self.get_legal_moves(i, j)
                     for legal_move in piece_legal_moves:
                         every_legal_moves.append(legal_move)
         return every_legal_moves
@@ -89,7 +92,7 @@ class Game:
         if not piece.piece_color == self.current_player.color:
             raise IllegalMoveError("La couleur de la pièce jouée doit être la même que celle du joueur actuel.")
         
-        piece_legal_moves: list[Case] = self.get_legal_moves(move.start.line, move.start.column, self.current_player.color)
+        piece_legal_moves: list[Case] = self.get_legal_moves(move.start.line, move.start.column)
         if not move.end in piece_legal_moves:
             raise IllegalMoveError("L'attribut end d'un move doit être une case atteignable par la pièce contenue dans l'attribut start.")
 
