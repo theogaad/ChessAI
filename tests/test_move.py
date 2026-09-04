@@ -8,3 +8,5 @@ def test_move_creation() -> None:
     assert move.start == start_case
     assert move.end == end_case
     assert move.special_move == SpecialMove.NONE
+    move.special_move = SpecialMove.CASTLING
+    assert move.special_move == SpecialMove.CASTLING
