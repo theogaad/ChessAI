@@ -4,9 +4,13 @@ from src.chess.board import Board
 from src.chess.move import Move, SpecialMove
 from src.chess.case import Case
 from src.chess.pieces.piece import Piece, PieceColor
+from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
+from src.chess.pieces.knight import Knight
 from src.chess.pieces.pawn import Pawn
+from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
+from src.chess.exceptions.chess_error import ChessError
 from src.chess.exceptions.illegal_move_error import IllegalMoveError
 from src.chess.constants import BOARD_SIZE
 from random import randint
@@ -99,13 +103,24 @@ class Game:
 
         self.change_move_type(move)
 
+        if move.special_move != SpecialMove.PROMOTION and move.promotion_piece_type is not None:
+            raise ChessError("L'attribut promotion_piece_type du move devrait être None.")
+        if move.special_move == SpecialMove.PROMOTION and move.promotion_piece_type is None:
+            raise ChessError("Aucune type de pièce choisi pour la promotion")
+        
         # Roque
         if move.special_move == SpecialMove.CASTLING:
             rook_case: Case = self.board.grid[move.start.line][7 if move.start.column < move.end.column else 0]
             rook_move: Move = Move(rook_case, self.board.grid[move.start.line][5 if move.start.column < move.end.column else 3])
             self.board.apply_move(rook_move)
+            
         self.board.apply_move(move)
         self.moves.append(move)
+
+        # Promotion
+        if move.special_move == SpecialMove.PROMOTION and move.promotion_piece_type is not None:
+            self.promotion(move.end.line, move.end.column, move.promotion_piece_type)
+
         self.switch_players()
 
     def change_move_type(self, move: Move) -> None:
@@ -117,6 +132,14 @@ class Game:
             move.special_move = SpecialMove.PROMOTION
         else:
             move.special_move = SpecialMove.NONE
+
+    def promotion(self, line: int, column: int, new_type: type[Bishop|Knight|Queen|Rook]) -> None:
+        if new_type not in (Bishop, Knight, Queen, Rook):
+            raise ChessError("Promotion : Type de pièce invalide.")
+        case_content: Piece|None = self.board.grid[line][column].content
+        if not isinstance(case_content, Pawn):
+            raise ChessError("Promotion : La pièce à promouvoir doit être un pion.")
+        self.board.grid[line][column].content = new_type(case_content.piece_color)
 
     def is_stalemate(self, color: PieceColor) -> bool:
             is_checked: bool = self.board.is_checked(color)
