@@ -5,6 +5,7 @@ from src.chess.move import Move, SpecialMove
 from src.chess.case import Case
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.king import King
+from src.chess.pieces.pawn import Pawn
 from src.chess.pieces.rook import Rook
 from src.chess.exceptions.illegal_move_error import IllegalMoveError
 from src.chess.constants import BOARD_SIZE
@@ -96,6 +97,8 @@ class Game:
         if not move.end in piece_legal_moves:
             raise IllegalMoveError("L'attribut end d'un move doit être une case atteignable par la pièce contenue dans l'attribut start.")
 
+        self.change_move_type(move)
+
         # Roque
         if move.special_move == SpecialMove.CASTLING:
             rook_case: Case = self.board.grid[move.start.line][7 if move.start.column < move.end.column else 0]
@@ -104,6 +107,16 @@ class Game:
         self.board.apply_move(move)
         self.moves.append(move)
         self.switch_players()
+
+    def change_move_type(self, move: Move) -> None:
+        if isinstance(move.start.content, King) and abs(move.start.column - move.end.column) == 2:
+            move.special_move = SpecialMove.CASTLING
+        elif isinstance(move.start.content, Pawn) and (
+            (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or 
+            (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0)):
+            move.special_move == SpecialMove.PROMOTION
+        else:
+            move.special_move == SpecialMove.NONE
 
     def is_stalemate(self, color: PieceColor) -> bool:
             is_checked: bool = self.board.is_checked(color)
