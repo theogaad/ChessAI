@@ -114,9 +114,9 @@ class Game:
         elif isinstance(move.start.content, Pawn) and (
             (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or 
             (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0)):
-            move.special_move == SpecialMove.PROMOTION
+            move.special_move = SpecialMove.PROMOTION
         else:
-            move.special_move == SpecialMove.NONE
+            move.special_move = SpecialMove.NONE
 
     def is_stalemate(self, color: PieceColor) -> bool:
             is_checked: bool = self.board.is_checked(color)
