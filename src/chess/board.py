@@ -1,6 +1,6 @@
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.case import Case
-from src.chess.move import Move
+from src.chess.move import Move, SpecialMove
 from src.chess.constants import BOARD_SIZE, INITIAL_BOARD_CONFIG
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
@@ -102,7 +102,9 @@ class Board:
             return king_case in every_attacked_cases
 
     def apply_move(self, move: Move) -> None:
-        if isinstance(move.start.content, (King, Pawn, Rook)):
+        if isinstance(move.start.content, (King, Pawn, Rook)) and not move.start.content.has_moved:
             move.start.content.has_moved = True
         move.end.content = move.start.content
         move.start.content = None
+        if move.special_move == SpecialMove.EN_PASSANT:
+            self.grid[move.start.line][move.end.column].content = None
