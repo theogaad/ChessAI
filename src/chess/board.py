@@ -9,16 +9,6 @@ from src.chess.pieces.pawn import Pawn
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
 
-INITIAL_BOARD_CONFIG: list[list[Piece|None]] = \
-[[Rook(PieceColor.WHITE), Knight(PieceColor.WHITE), Bishop(PieceColor.WHITE), Queen(PieceColor.WHITE), King(PieceColor.WHITE), Bishop(PieceColor.WHITE), Knight(PieceColor.WHITE), Rook(PieceColor.WHITE)],
-[Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
-[None for _ in range(BOARD_SIZE)],
-[None for _ in range(BOARD_SIZE)],
-[None for _ in range(BOARD_SIZE)],
-[None for _ in range(BOARD_SIZE)],
-[Pawn(PieceColor.BLACK) for _ in range(BOARD_SIZE)],
-[Rook(PieceColor.BLACK), Knight(PieceColor.BLACK), Bishop(PieceColor.BLACK), Queen(PieceColor.BLACK), King(PieceColor.BLACK), Bishop(PieceColor.BLACK), Knight(PieceColor.BLACK), Rook(PieceColor.BLACK)]]
-
 # Classe représentant un plateau d'échecs, contenant une grille (8x8) de cases
 class Board:
     def __init__(self) -> None:
@@ -39,8 +29,20 @@ class Board:
                 else:
                     self.grid[i][j].content = None
 
+    def get_initial_board_config(self) -> list[list[Piece | None]]:
+        return [
+                [Rook(PieceColor.WHITE), Knight(PieceColor.WHITE), Bishop(PieceColor.WHITE), Queen(PieceColor.WHITE), King(PieceColor.WHITE), Bishop(PieceColor.WHITE), Knight(PieceColor.WHITE), Rook(PieceColor.WHITE)],
+                [Pawn(PieceColor.WHITE) for _ in range(BOARD_SIZE)],
+                [None for _ in range(BOARD_SIZE)],
+                [None for _ in range(BOARD_SIZE)],
+                [None for _ in range(BOARD_SIZE)],
+                [None for _ in range(BOARD_SIZE)],
+                [Pawn(PieceColor.BLACK) for _ in range(BOARD_SIZE)],
+                [Rook(PieceColor.BLACK), Knight(PieceColor.BLACK), Bishop(PieceColor.BLACK), Queen(PieceColor.BLACK), King(PieceColor.BLACK), Bishop(PieceColor.BLACK), Knight(PieceColor.BLACK), Rook(PieceColor.BLACK)]
+        ]
+
     def create_initial_board(self) -> None:
-        self.fill(INITIAL_BOARD_CONFIG)
+        self.fill(self.get_initial_board_config())
 
     def get_possible_moves(self, line: int, column: int) -> list[Case]:
         case: Case = self.grid[line][column]

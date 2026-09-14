@@ -30,6 +30,7 @@ class Game:
         self.current_player: Player = self.players[0]
 
         self.board: Board = Board()
+        self.board.create_initial_board()
         self.moves: list[Move] = []
         self.winner: None|Player = None
 
