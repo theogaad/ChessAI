@@ -1,6 +1,6 @@
 from src.chess.board import Board
 from src.chess.case import Case
-from src.chess.move import Move
+from src.chess.move import Move, SpecialMove
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.king import King
@@ -312,6 +312,20 @@ def test_board_is_checked(empty_board: Board) -> None:
     assert empty_board.is_checked(PieceColor.WHITE) == True
     assert empty_board.is_checked(PieceColor.BLACK) == True
 
+def test_get_attacked_cases(empty_board: Board) -> None:
+    empty_board.grid[0][0].content = King(PieceColor.WHITE)
+    empty_board.grid[7][7].content = King(PieceColor.BLACK)
+    empty_board.grid[1][1].content = Pawn(PieceColor.BLACK)
+    empty_board.grid[0][7].content = Rook(PieceColor.WHITE)
+
+    white_attacked_cases: list[Case] = empty_board.get_attacked_cases(PieceColor.WHITE)
+    black_attacked_cases: list[Case] = empty_board.get_attacked_cases(PieceColor.BLACK)
+
+    assert empty_board.grid[7][7] in white_attacked_cases
+    assert empty_board.grid[0][0] in black_attacked_cases
+    assert empty_board.grid[7][6] not in white_attacked_cases
+    assert empty_board.grid[0][1] not in black_attacked_cases
+
 def test_board_apply_move(initial_board_configuration: Board) -> None:
     pawn_move: Move = Move(initial_board_configuration.grid[1][0], initial_board_configuration.grid[2][0])
     if isinstance(initial_board_configuration.grid[1][0].content, Pawn):
@@ -319,3 +333,19 @@ def test_board_apply_move(initial_board_configuration: Board) -> None:
     initial_board_configuration.apply_move(pawn_move)
     assert initial_board_configuration.grid[1][0].content == None
     assert initial_board_configuration.grid[2][0].content == white_pawn_moving
+    assert white_pawn_moving.has_moved == True
+
+def test_board_apply_move_en_passant(initial_board_configuration: Board) -> None:
+    if not isinstance(initial_board_configuration.grid[1][4].content, Pawn) or not isinstance(initial_board_configuration.grid[6][5].content, Pawn):
+        pytest.fail("Les pièces aux positions spécifiées ne sont pas des pions.")
+    white_pawn: Pawn = initial_board_configuration.grid[1][4].content
+    black_pawn: Pawn = initial_board_configuration.grid[6][5].content
+    initial_board_configuration.apply_move(Move(initial_board_configuration.grid[1][4], initial_board_configuration.grid[4][4]))
+    initial_board_configuration.apply_move(Move(initial_board_configuration.grid[6][5], initial_board_configuration.grid[4][5]))
+    en_passant_move: Move = Move(initial_board_configuration.grid[4][4], initial_board_configuration.grid[5][5], SpecialMove.EN_PASSANT)
+    initial_board_configuration.apply_move(en_passant_move)
+    assert initial_board_configuration.grid[4][4].content == None
+    assert initial_board_configuration.grid[5][5].content == white_pawn
+    assert black_pawn not in [case.content for row in initial_board_configuration.grid for case in row]
+    assert white_pawn.has_moved == True
+    assert black_pawn.has_moved == True

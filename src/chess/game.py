@@ -49,6 +49,7 @@ class Game:
                 continue
             legal_moves.append(case)
             legal_moves.extend(self.get_castling_moves(line, column))
+            legal_moves.extend(self.get_en_passant_moves(line, column))
         return legal_moves
 
     def get_castling_moves(self, line: int, column: int) -> list[Case]:
@@ -77,6 +78,21 @@ class Game:
                     if case_between_king_and_rook_is_empty and case_between_king_and_rook_is_not_checked:
                         castling_moves.append(self.board.grid[line][column + 2 * direction])
         return castling_moves
+
+    def get_en_passant_moves(self, line: int, column: int) -> list[Case]:
+        en_passant_moves: list[Case] = []
+        actual_case: Case = self.board.grid[line][column]
+        if isinstance(actual_case.content, Pawn) and self.moves:
+            last_move: Move = self.moves[-1]
+            last_move_end_case: Case = self.board.grid[last_move.end.line][last_move.end.column]
+            if isinstance(last_move_end_case.content, Pawn) and \
+               last_move_end_case.content.piece_color != actual_case.content.piece_color and \
+               abs(last_move.start.line - last_move.end.line) == 2 and \
+               last_move.end.line == line and abs(last_move.end.column - column) == 1:
+                end_case: Case = self.board.grid[line + (1 if actual_case.content.piece_color == PieceColor.WHITE else -1)][last_move.end.column]
+                if end_case.content is None:
+                    en_passant_moves.append(end_case)
+        return en_passant_moves
 
     def get_color_every_legal_moves(self, color: PieceColor) -> list[Case]:
         every_legal_moves: list[Case] = []
@@ -130,7 +146,7 @@ class Game:
             (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or \
             (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0)):
             move.special_move = SpecialMove.PROMOTION
-        elif self.is_en_passant(move):
+        elif move.end in self.get_en_passant_moves(move.start.line, move.start.column):
             move.special_move = SpecialMove.EN_PASSANT
         else:
             move.special_move = SpecialMove.NONE
@@ -142,22 +158,6 @@ class Game:
         if not isinstance(case_content, Pawn):
             raise ChessError("Promotion : La pièce à promouvoir doit être un pion.")
         self.board.grid[line][column].content = new_type(case_content.piece_color)
-
-    def is_en_passant(self, move: Move) -> bool:
-        if not self.moves:
-            return False
-        last_move: Move = self.moves[-1]
-        en_passant_case: Case = self.board.grid[last_move.end.line][last_move.end.column]
-        return (
-            self.board.grid[move.end.line][move.end.column].content is None and 
-            move.start.column != move.end.column and 
-            abs(last_move.start.line - last_move.end.line) == 2 and 
-            last_move.end.line == move.start.line and 
-            last_move.end.column == move.end.column and 
-            isinstance(en_passant_case.content, Pawn) and 
-            isinstance(move.start.content, Pawn) and 
-            en_passant_case.content.piece_color != move.start.content.piece_color
-        )
 
     def is_stalemate(self, color: PieceColor) -> bool:
             is_checked: bool = self.board.is_checked(color)
