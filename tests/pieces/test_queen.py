@@ -13,7 +13,7 @@ def test_queen_creation(piece_color: PieceColor) -> None:
 
 @pytest.mark.parametrize("piece_color", ["test_wrong_color", 12345678, False])
 def test_queen_wrong_creation(piece_color) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Queen(piece_color)
 
 @pytest.mark.parametrize("start, expected_end_position", [

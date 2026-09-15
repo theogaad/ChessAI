@@ -34,7 +34,7 @@ def test_game_correct_number_of_players(normal_game: Game) -> None:
     ([Profile(), Profile(), Profile()])
 ])
 def test_game_incorrect_number_of_players(profiles: list[Profile]) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Game(profiles)
 
 def test_game_player_color(normal_game: Game) -> None:

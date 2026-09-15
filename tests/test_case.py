@@ -1,3 +1,4 @@
+from src.chess.exceptions.illegal_position_error import IllegalPositionError
 from src.chess.case import Case
 import pytest
 
@@ -10,6 +11,6 @@ def test_case_creation(line, column) -> None:
 
 @pytest.mark.parametrize("line, column", [(-1, 0), (0, -1), (8, 0), (0, 8)])
 def test_case_creation_invalid_position(line, column) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(IllegalPositionError):
         Case(line, column)
         
