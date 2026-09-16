@@ -1,4 +1,5 @@
 from copy import deepcopy
+from enum import Enum
 from random import randint
 from src.chess.board import Board
 from src.chess.case import Case
@@ -19,6 +20,16 @@ from src.chess.utils import is_valid_position
 
 
 
+class GameStatus(Enum):
+    IN_PROGRESS = "in_progress"
+    CHECK = "check"
+    CHECKMATE = "checkmate"
+    STALEMATE = "stalemate"
+    DRAW_50_MOVES = "draw_50_moves"
+    DRAW_INSUFFICIENT_MATERIAL = "draw_insufficient_material"
+
+
+
 class Game:
     def __init__(self, profiles: list[Profile]) -> None:
         if not all(isinstance(profile, Profile) for profile in profiles) or len(profiles) != 2:
@@ -35,6 +46,7 @@ class Game:
         self.board.create_initial_board()
         self.moves: list[Move] = []
         self.winner: None|Player = None
+        self.status: GameStatus = GameStatus.IN_PROGRESS
 
 
     def switch_players(self) -> None:
@@ -113,10 +125,10 @@ class Game:
             last_move: Move = self.moves[-1]
             last_move_end_case: Case = self.board.grid[last_move.end.line][last_move.end.column]
 
-            if isinstance(last_move_end_case.content, Pawn) and \
-            last_move_end_case.content.piece_color != actual_case.content.piece_color and \
-            abs(last_move.start.line - last_move.end.line) == 2 and \
-            last_move.end.line == line and abs(last_move.end.column - column) == 1:
+            if (isinstance(last_move_end_case.content, Pawn) and
+            last_move_end_case.content.piece_color != actual_case.content.piece_color and
+            abs(last_move.start.line - last_move.end.line) == 2 and
+            last_move.end.line == line and abs(last_move.end.column - column) == 1):
                 end_case: Case = self.board.grid[line + (1 if actual_case.content.piece_color == PieceColor.WHITE else -1)][last_move.end.column]
 
                 if end_case.content is None:
@@ -168,6 +180,12 @@ class Game:
         
         if move.special_move == SpecialMove.PROMOTION and move.promotion_piece_type is None:
             raise ChessError("Aucune type de pièce choisi pour la promotion")
+
+        move.captured_piece = move.end.content
+
+        # En passant
+        if move.special_move == SpecialMove.EN_PASSANT:
+            move.captured_piece = self.board.grid[move.start.line][move.end.column].content
         
         # Roque
         if move.special_move == SpecialMove.CASTLING:
@@ -183,6 +201,7 @@ class Game:
             self.promotion(move.end.line, move.end.column, move.promotion_piece_type)
 
         self.switch_players()
+        self.update_game_status()
 
 
     def change_move_type(self, move: Move) -> None:
@@ -192,8 +211,8 @@ class Game:
         if isinstance(move.start.content, King) and abs(move.start.column - move.end.column) == 2:
             move.special_move = SpecialMove.CASTLING
 
-        elif isinstance(move.start.content, Pawn) and (\
-        (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or \
+        elif isinstance(move.start.content, Pawn) and (
+        (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or
         (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0)):
             move.special_move = SpecialMove.PROMOTION
 
@@ -218,6 +237,55 @@ class Game:
         self.board.grid[line][column].content = new_type(case_content.piece_color)
 
 
+    def is_50_moves(self) -> bool:
+        count: int = 0
+
+        for move in reversed(self.moves):
+            if not isinstance(move.moving_piece, Pawn) and move.captured_piece is None:
+                count += 1
+
+            else:
+                break
+
+        return count >= 100
+
+
+    def is_insufficient_material(self) -> bool:
+        white_pieces: list[Piece] = self.board.get_color_all_pieces(PieceColor.WHITE)
+        black_pieces: list[Piece] = self.board.get_color_all_pieces(PieceColor.BLACK)
+        white_bishop: None | Bishop = None
+        black_bishop: None | Bishop = None
+
+        if len(white_pieces) > 2 or len(black_pieces) > 2:
+            return False
+
+        for list_of_pieces in [white_pieces, black_pieces]:
+            for piece in list_of_pieces:
+                if isinstance(piece, (Pawn, Queen, Rook)):
+                    return False
+
+                elif isinstance(piece, Bishop): 
+                    if piece.piece_color == PieceColor.WHITE:
+                        white_bishop = piece
+
+                    else:
+                        black_bishop = piece
+
+        if len(white_pieces) == 2 and len(black_pieces) == 2:
+            if white_bishop and black_bishop:
+                white_bishop_position: tuple[int, int] | None = self.board.get_piece_position(white_bishop)
+                black_bishop_position: tuple[int, int] | None = self.board.get_piece_position(black_bishop)
+
+                if (white_bishop_position and black_bishop_position and
+                    (((white_bishop_position[0] + white_bishop_position[1]) % 2 == (black_bishop_position[0] + black_bishop_position[1]) % 2) or
+                    ((white_bishop_position[0] + white_bishop_position[1]) % 2 == (black_bishop_position[0] + black_bishop_position[1]) % 2))):
+                    return True
+
+            return False
+
+        return True
+
+
     def is_stalemate(self, color: PieceColor) -> bool:
         if not isinstance(color, PieceColor):
             raise TypeError("is_stalemate(self, color) Le paramètre color doit être du type PieceColor.")
@@ -226,6 +294,7 @@ class Game:
         every_legal_moves: list[Case] = self.get_color_every_legal_moves(color)
 
         return not is_checked and not every_legal_moves
+
 
     def is_checkmate(self, color: PieceColor) -> bool:
         if not isinstance(color, PieceColor):
@@ -236,8 +305,42 @@ class Game:
 
         return is_checked and not every_legal_moves
 
-    def is_game_over(self, player: Player) -> bool:
-        if not isinstance(player, Player):
-            raise TypeError("is_game_over(self, player) Le paramètre player doit être du type Player.")
+
+    def update_game_status(self):
+        if self.is_checkmate(self.current_player.color):
+            self.status = GameStatus.CHECKMATE
+            self.switch_players()
+            self.game_issue(self.current_player)
+            self.end_the_game()
+
+        elif self.board.is_checked(self.current_player.color):
+            self.status = GameStatus.CHECK
+
+        elif self.is_stalemate(self.current_player.color):
+            self.status = GameStatus.STALEMATE
+            self.game_issue(None)
+            self.end_the_game()
+
+        elif self.is_insufficient_material(self.current_player.color):
+            self.status = GameStatus.DRAW_INSUFFICIENT_MATERIAL
+            self.game_issue(None)
+            self.end_the_game()
+
+        elif self.is_50_moves():
+            self.status = GameStatus.DRAW_50_MOVES
+            self.game_issue(None)
+            self.end_the_game()
+
+        else:
+            self.status = GameStatus.IN_PROGRESS
+
+
+    def game_issue(self, winner: Player | None) -> None:
+        if not (isinstance(winner, Player) or winner is None):
+            raise TypeError("end_the_game(self, winner) Le paramètre winner doit être du type Player.")
         
-        return self.is_stalemate(player.color) or self.is_checkmate(player.color)
+        self.winner = winner
+
+    
+    def end_the_game(self):
+        pass

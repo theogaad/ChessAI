@@ -52,6 +52,32 @@ class Board:
         self.fill(self.get_initial_board_config())
 
 
+    def get_color_all_pieces(self, color: PieceColor) -> list[Piece]:
+        if not isinstance(color, PieceColor):
+            raise TypeError("get_color_all_pieces(self, color) Le paramètre color doit être du type PieceColor.")
+
+        pieces: list[Piece] = []
+
+        for row in self.grid:
+            for case in row:
+                if isinstance(case.content, Piece) and case.content.piece_color == color:
+                    pieces.append(case.content)
+
+        return pieces
+
+
+    def get_piece_position(self, piece: Piece) -> tuple[int, int] | None:
+        if not isinstance(piece, Piece):
+            raise TypeError("get_piece_position(self, piece) Le paramètre piece doit être du type Piece.")
+
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                if self.grid[i][j] == piece:
+                    return (i, j)
+
+        return None
+
+
     def get_possible_moves(self, line: int, column: int) -> list[Case]:
         is_valid_position(line, column, "get_possible_moves(self, line, column)")
 
