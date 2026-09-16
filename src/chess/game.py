@@ -321,7 +321,7 @@ class Game:
             self.game_issue(None)
             self.end_the_game()
 
-        elif self.is_insufficient_material(self.current_player.color):
+        elif self.is_insufficient_material():
             self.status = GameStatus.DRAW_INSUFFICIENT_MATERIAL
             self.game_issue(None)
             self.end_the_game()

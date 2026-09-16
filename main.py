@@ -4,6 +4,9 @@ from src.chess.profile import Profile
 
 
 
+Theo: Profile = Profile()
+Ia: Profile = Profile()
+
 # Simulation d'une partie (Mat du berger)
 game: Game = Game([Profile(), Profile()])
 list_of_moves: list[list[tuple[int, int]]] = [
@@ -16,7 +19,7 @@ list_of_moves: list[list[tuple[int, int]]] = [
     [(2, 5), (6, 5)]
 ]
 for moves in list_of_moves:
-    print(game.is_game_over(game.current_player))
+    print(game.status)
     move: Move = Move(game.board.grid[moves[0][0]][moves[0][1]], game.board.grid[moves[1][0]][moves[1][1]])
     game.play_move(move)
-print(game.is_game_over(game.current_player))
+print(game.status)
