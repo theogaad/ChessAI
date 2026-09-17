@@ -72,7 +72,7 @@ class Board:
 
         for i in range(BOARD_SIZE):
             for j in range(BOARD_SIZE):
-                if self.grid[i][j] == piece:
+                if self.grid[i][j].content == piece:
                     return (i, j)
 
         return None
