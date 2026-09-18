@@ -1,3 +1,4 @@
+from src.chess.ai.ai_player import AIPlayer
 from src.chess.case import Case
 from src.chess.constants import BOARD_SIZE, CASE_SIZE
 from src.chess.game import Game, GameStatus
@@ -133,7 +134,7 @@ def turn_case_to_yellow(screen, position: tuple[int, int]):
     screen.blit(yellow_case, (pygame_position[0], pygame_position[1]))
     #pygame.draw.rect(screen, (255, 255, 0, 0), (pygame_position[0], pygame_position[1], CASE_SIZE, CASE_SIZE))
 
-def pygame_main(game: Game) -> None:
+def pygame_main(game: Game, ai: AIPlayer) -> None:
     pygame.init()
 
     chess_screen = pygame.display.set_mode((BOARD_SIZE * CASE_SIZE - 1, BOARD_SIZE * CASE_SIZE - 1))
@@ -178,6 +179,7 @@ def pygame_main(game: Game) -> None:
                                 get_promotion_choice(game, move)
                             game.play_move(move)
                             piece_legal_moves = []
+                            ai.play_random_move(game)
                         display_game(chess_screen, game)
                         selected_case = None
 
