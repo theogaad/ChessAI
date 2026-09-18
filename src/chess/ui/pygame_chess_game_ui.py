@@ -97,7 +97,7 @@ def display_chess_board(screen) -> None:
     for i in range(BOARD_SIZE):
         for j in range(BOARD_SIZE):
             if (i + j) % 2 == 0:
-                color = (0, 0, 0)
+                color = (50, 50, 50)
             else:
                 color = (255, 255, 255)
             pygame.draw.rect(screen, color, (i * CASE_SIZE, board_line_to_pygame_line(j), CASE_SIZE, CASE_SIZE))
@@ -127,7 +127,11 @@ def display_game(screen, game: Game):
 
 def turn_case_to_yellow(screen, position: tuple[int, int]):
     pygame_position: tuple[int, int] = board_position_to_pygame_position(position)
-    pygame.draw.rect(screen, (255, 255, 0), (pygame_position[0], pygame_position[1], CASE_SIZE, CASE_SIZE))
+    yellow_case: pygame.Surface = pygame.Surface((CASE_SIZE, CASE_SIZE))
+    yellow_case.set_alpha(128)
+    yellow_case.fill((255, 255, 0))
+    screen.blit(yellow_case, (pygame_position[0], pygame_position[1]))
+    #pygame.draw.rect(screen, (255, 255, 0, 0), (pygame_position[0], pygame_position[1], CASE_SIZE, CASE_SIZE))
 
 def pygame_main(game: Game) -> None:
     pygame.init()
