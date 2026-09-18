@@ -1,5 +1,6 @@
 python -m mypy --check-untyped-defs src tests
 python -m pytest
+.\.venv\Scripts\python.exe -m pip install pygame
 
 
 --------------- Conventions ---------------

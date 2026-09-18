@@ -211,9 +211,7 @@ class Game:
         if isinstance(move.start.content, King) and abs(move.start.column - move.end.column) == 2:
             move.special_move = SpecialMove.CASTLING
 
-        elif isinstance(move.start.content, Pawn) and (
-        (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or
-        (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0)):
+        elif self.is_promotion(move):
             move.special_move = SpecialMove.PROMOTION
 
         elif move.end in self.get_en_passant_moves(move.start.line, move.start.column):
@@ -221,6 +219,12 @@ class Game:
 
         else:
             move.special_move = SpecialMove.NONE
+
+
+    def is_promotion(self, move: Move) -> bool:
+        return isinstance(move.start.content, Pawn) and (
+        (move.start.content.piece_color == PieceColor.WHITE and move.end.line == 7) or
+        (move.start.content.piece_color == PieceColor.BLACK and move.end.line == 0))
 
 
     def promotion(self, line: int, column: int, new_type: type[Bishop|Knight|Queen|Rook]) -> None:
