@@ -10,6 +10,7 @@ from src.chess.pieces.pawn import Pawn
 from src.chess.pieces.piece import Piece, PieceColor
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
+from src.chess.profile import Profile
 import pygame
 
 def board_line_to_pygame_line(line: int) -> int:
@@ -134,8 +135,10 @@ def turn_case_to_yellow(screen, position: tuple[int, int]):
     screen.blit(yellow_case, (pygame_position[0], pygame_position[1]))
     #pygame.draw.rect(screen, (255, 255, 0, 0), (pygame_position[0], pygame_position[1], CASE_SIZE, CASE_SIZE))
 
-def pygame_main(game: Game, ai: AIPlayer) -> None:
+def pygame_main(game: Game) -> None:
     pygame.init()
+
+    ai: AIPlayer = AIPlayer(Profile(), PieceColor.BLACK)
 
     chess_screen = pygame.display.set_mode((BOARD_SIZE * CASE_SIZE - 1, BOARD_SIZE * CASE_SIZE - 1))
 
@@ -179,7 +182,7 @@ def pygame_main(game: Game, ai: AIPlayer) -> None:
                                 get_promotion_choice(game, move)
                             game.play_move(move)
                             piece_legal_moves = []
-                            ai.play_random_move(game)
+                            ai.play_move_based_on_next_value_depth_1(game)
                         display_game(chess_screen, game)
                         selected_case = None
 
