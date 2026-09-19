@@ -182,7 +182,7 @@ def pygame_main(game: Game) -> None:
                                 get_promotion_choice(game, move)
                             game.play_move(move)
                             piece_legal_moves = []
-                            ai.play_move_based_on_next_value_depth_1(game)
+                            ai.minimax_depth_1(game)
                         display_game(chess_screen, game)
                         selected_case = None
 

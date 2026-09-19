@@ -44,7 +44,7 @@ class Move:
         if not isinstance(self.special_move, SpecialMove):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut special_move doit être du type SpecialMove.")
         
-        if not (self.promotion_piece_type not in (Bishop, Knight, Queen, Rook) or 
+        if not (self.promotion_piece_type in (Bishop, Knight, Queen, Rook) or 
                 self.promotion_piece_type is None):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut promotion_piece_type doit être du type None, Bishop, Knight, Queen ou Rook.")
 

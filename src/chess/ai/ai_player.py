@@ -45,34 +45,42 @@ class AIPlayer(Player):
                     list_of_pieces.pop(random_index)
 
 
-    def play_move_based_on_next_value_depth_1(self, game: Game) -> None:
-        list_of_pieces: list[Piece] = game.board.get_color_all_pieces(self.color)
-        list_of_values: list[tuple[int, Move]] = []
+    def minimax_depth_1(self, game: Game) -> None:
+        list_of_move_values: list[tuple[int, Move]] = self.get_list_of_move_values(game, self.color)
 
-        for piece in list_of_pieces:
-            piece_position: None | tuple[int, int] = game.board.get_piece_position(piece)
+        if list_of_move_values:
+            list_of_move_values.sort(key=lambda x: x[0], reverse=True)
 
-            if piece_position is not None:
-                piece_possible_moves: list[Case] = game.get_legal_moves(piece_position[0], piece_position[1])
-
-                for possible_move in piece_possible_moves:
-                    move: Move = Move(game.board.grid[piece_position[0]][piece_position[1]], possible_move)
-
-                    if game.is_promotion(move):
-                        possible_promotions: list[type] = [Bishop, Knight, Queen, Rook]
-                        move.promotion_piece_type = choice(possible_promotions)
-
-                    game_after_move: Game = self.apply_move(game, move)
-                    list_of_values.append((self.get_board_value(game_after_move), move))
-
-        if list_of_values:
-            list_of_values.sort(key=lambda x: x[0], reverse=True)
-
-            if list_of_values[0][0] == list_of_values[-1][0]:
-                game.play_move(choice(list_of_values)[1])
+            if list_of_move_values[0][0] == list_of_move_values[-1][0]:
+                game.play_move(list_of_move_values[0][1])
 
             else:
-                game.play_move(list_of_values[0][1])
+                game.play_move(list_of_move_values[0][1])
+
+
+    def minimax_depth_2(self, game: Game) -> None:
+        list_of_move_values: list[tuple[int, Move]] = self.get_list_of_move_values(game, self.color)
+
+        for i in range(len(list_of_move_values)):
+            list_of_enemy_move_values: list[tuple[int, Move]] = \
+            self.get_list_of_move_values(self.apply_move(game, list_of_move_values[i][1]), 
+                                         PieceColor.WHITE if self.color == PieceColor.BLACK else PieceColor.BLACK)
+
+            if not list_of_enemy_move_values:
+                game.play_move(list_of_move_values[i][1])
+
+            else:
+                list_of_enemy_move_values.sort(key=lambda x: x[0])
+                list_of_move_values[i] = (list_of_enemy_move_values[0][0], list_of_move_values[i][1])
+
+        if list_of_move_values:
+            list_of_move_values.sort(key=lambda x: x[0], reverse=True)
+
+            if list_of_move_values[0][0] == list_of_move_values[-1][0]:
+                game.play_move(choice(list_of_move_values)[1])
+
+            else:
+                game.play_move(list_of_move_values[0][1])
 
 
     def apply_move(self, game: Game, move: Move) -> Game:
@@ -111,3 +119,30 @@ class AIPlayer(Player):
         enemy_value: int = self.get_pieces_value(enemy_pieces)
 
         return ai_value - enemy_value
+
+
+    def get_list_of_move_values(self, game: Game, color: PieceColor) -> list[tuple[int, Move]]:
+        list_of_pieces: list[Piece] = game.board.get_color_all_pieces(color)
+        list_of_values: list[tuple[int, Move]] = []
+
+        for piece in list_of_pieces:
+            piece_position: None | tuple[int, int] = game.board.get_piece_position(piece)
+
+            if piece_position is not None:
+                piece_possible_moves: list[Case] = game.get_legal_moves(piece_position[0], piece_position[1])
+
+                for possible_move in piece_possible_moves:
+                    move: Move = Move(game.board.grid[piece_position[0]][piece_position[1]], possible_move)
+
+                    if game.is_promotion(move):
+                        possible_promotions: list[type] = [Bishop, Knight, Queen, Rook]
+                        for promotion in possible_promotions:
+                            move.promotion_piece_type = promotion
+                            game_after_move: Game = self.apply_move(game, move)
+                            list_of_values.append((self.get_board_value(game_after_move), move))
+
+                    else:
+                        game_after_move = self.apply_move(game, move)
+                        list_of_values.append((self.get_board_value(game_after_move), move))
+
+        return list_of_values
