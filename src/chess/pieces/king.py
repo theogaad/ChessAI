@@ -5,12 +5,12 @@ from src.chess.utils import verify_type
 
 
 class King(Piece):
-    def __init__(self, color: PieceColor):
+    def __init__(self, color: PieceColor) -> None:
         super().__init__(color)
 
 
-    def get_positions(self, position: Position) -> list[Position]:
-        verify_type(position, Position, "get_positions(position)", "position")
+    def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
+        verify_type(position, Position, "get_reachable_positions_from_position(position)", "position")
 
         list_of_positions: list[Position] = []
         # "offset" désigne un mouvement/direction possible de la pièce

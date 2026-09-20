@@ -24,8 +24,5 @@ class Position:
             raise IllegalPositionError(f"Position(line, column) L'attribut column doit être supérieur ou égal à 0 et inférieur à {BOARD_SIZE}.")
 
 
-    #def is_equal(self, position: Position) -> bool:
-        #if not isinstance(position, Position):
-            #raise TypeError("is_equal(self, position) Le paramètre position doit être du type Position.")
-
-        #return self.line == position.line and self.column == position.column
+    def __repr__(self) -> str:
+        return f"({self.line}, {self.column})"
