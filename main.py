@@ -5,6 +5,6 @@ from src.chess.utils import verify_type
 
 #pygame_main(Game([Profile(), Profile()]))
 def test(a: int):
-    verify_type(a, int, "test(a)")
+    verify_type(a, int, "test(a)", "a")
 
-test(1)
+test("1")
