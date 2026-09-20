@@ -27,31 +27,33 @@ class Move:
     end_case (private) -- case d'arrivée
     move_type (private) -- type du coup (par défault MoveType.NORMAL)
     promotion_piece_type (private) -- type de piece pour une éventuelle promotion (par défault None)
-    captured_piece (private) -- piece éventuellement capturée lors du coup (par défault None)"""
+    captured_piece (private) -- piece éventuellement capturée lors du coup (défini dans __post_init__)
+    moving_piece (private) -- piece qui effectue le coup (défini dans __post_init__)
+    """
     __start_case: Case
     __end_case: Case
     __move_type: MoveType = MoveType.NORMAL
     __promotion_piece_type: None | type[Bishop | Knight | Queen | Rook] = None
-    __captured_piece: None | Piece = None
 
 
     def __post_init__(self) -> None:
-        """Vérifie le type de tous les attributs et initialise l'attribut moving_piece."""
-        verify_type(self.start_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None, captured_piece=None)", "start_case")
-        verify_type(self.end_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None, captured_piece=None)", "end_case")
-        verify_type(self.move_type, MoveType, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None, captured_piece=None)", "move_type")
+        """Vérifie le type de tous les attributs et initialise les attributs captured_piece et moving_piece."""
+        verify_type(self.start_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "start_case")
+        verify_type(self.end_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case")
+        verify_type(self.move_type, MoveType, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "move_type")
 
-        if not (self.promotion_piece_type in (Bishop, Knight, Queen, Rook) or 
-                self.promotion_piece_type is None):
-            raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut promotion_piece_type doit être du type None, Bishop, Knight, Queen ou Rook.")
+        if not (self.promotion_piece_type is None or 
+                self.promotion_piece_type in (Bishop, Knight, Queen, Rook)):
+            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre promotion_piece_type doit être du type None, Bishop, Knight, Queen ou Rook.")
 
-        if not (isinstance(self.captured_piece, Piece) or 
-                self.captured_piece is None):
-            raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut captured_piece doit être du type Piece ou None.")
+        if not (self.end_case.content is None or
+                isinstance(self.end_case.content, Piece)):
+            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre end_case.content doit être du type None ou Piece.")
 
         if not isinstance(self.start_case.content, Piece):
-            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None, captured_piece=None) Le paramètre start_case.content doit être du type Piece.")
-        
+            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre start_case.content doit être du type Piece.")
+
+        self.captured_piece: None | Piece = self.end_case.content
         self.moving_piece: Piece = self.start_case.content
 
 
@@ -121,6 +123,8 @@ class Move:
         if not (isinstance(new_captured_piece, Piece) or 
                 self.captured_piece is None):
             raise TypeError("capture_piece(new_captured_piece) Le paramètre new_captured_piece doit être du type None ou Piece.")
+
+        self.__captured_piece = new_captured_piece
 
     @property
     def moving_piece(self) -> Piece:
