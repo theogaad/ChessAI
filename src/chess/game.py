@@ -15,8 +15,8 @@ from src.chess.pieces.pawn import Pawn
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
 from src.chess.player import Player
+from src.chess.position import Position
 from src.chess.profile import Profile
-from src.chess.utils import is_valid_position
 
 
 
@@ -43,7 +43,7 @@ class Game:
         ]
         self.current_player: Player = self.players[0]
         self.board: Board = Board()
-        self.board.create_initial_board()
+        self.board.set_to_initial_board()
         self.moves: list[Move] = []
         self.winner: None|Player = None
         self.status: GameStatus = GameStatus.IN_PROGRESS
@@ -53,50 +53,47 @@ class Game:
         self.current_player = self.players[1] if self.current_player == self.players[0] else self.players[0]
 
 
-    def get_legal_moves(self, line: int, column: int) -> list[Case]:
-        is_valid_position(line, column, "get_legal_moves(self, line, column)")
-
-        case_content = self.board.grid[line][column].content
+    def get_legal_moves(self, position: Position) -> list[Case]:
+        case_content: None | Piece = self.board.grid[position.line][position.column].content
 
         if case_content is None:
             return []
         
         legal_moves: list[Case] = []
-        possible_moves: list[Case] = self.board.get_possible_moves(line, column)
+        possible_moves: list[Case] = self.board.get_reachable_cases_from_position(position)
 
         for case in possible_moves:
             board_after_move: Board = deepcopy(self.board)
-            board_after_move.apply_move(Move(board_after_move.grid[line][column], board_after_move.grid[case.line][case.column]))
+            board_after_move.apply_move(Move(board_after_move.grid[position.line][position.column], 
+                                             board_after_move.grid[case.position.line][case.position.column]))
 
             if board_after_move.is_checked(case_content.piece_color):
                 continue
 
             legal_moves.append(case)
-            legal_moves.extend(self.get_castling_moves(line, column))
-            legal_moves.extend(self.get_en_passant_moves(line, column))
+            legal_moves.extend(self.get_castling_moves(position))
+            legal_moves.extend(self.get_en_passant_moves(position))
 
         return legal_moves
 
 
-    def get_castling_moves(self, line: int, column: int) -> list[Case]:
-        is_valid_position(line, column, "get_castling_moves(self, line, column)")
-
+    def get_castling_moves(self, position: Position) -> list[Case]:
         castling_moves: list[Case] = []
-        actual_case: Case = self.board.grid[line][column]
+        actual_case: Case = self.board.grid[position.line][position.column]
 
         if isinstance(actual_case.content, King) and not actual_case.content.has_moved and not self.board.is_checked(actual_case.content.piece_color):
             king: King = actual_case.content
 
-            for possible_rook in [self.board.grid[line][0], self.board.grid[line][7]]: # Tableau des deux cases censées contenir les tours
+            for possible_rook in [self.board.grid[position.line][0], self.board.grid[position.line][7]]: # Tableau des deux cases censées contenir les tours
                 if isinstance(possible_rook.content, Rook) and not possible_rook.content.has_moved:
                     rook_case: Case = possible_rook
-                    rook_column: int = rook_case.column
-                    direction: int = 1 if rook_column > column else -1
+                    rook_column: int = rook_case.position.column
+                    direction: int = 1 if rook_column > position.column else -1
                     case_between_king_and_rook_is_empty: bool = True
                     case_between_king_and_rook_is_not_checked: bool = True
 
-                    for i in range(min(rook_column, column) + 1, max(rook_column, column)):
-                        temp_case = self.board.grid[line][i]
+                    for i in range(min(rook_column, position.column) + 1, max(rook_column, position.column)):
+                        temp_case = self.board.grid[position.line][i]
 
                         if temp_case.content is not None:
                             case_between_king_and_rook_is_empty = False
@@ -104,30 +101,29 @@ class Game:
 
                     for i in range(2):
                         temp_board = deepcopy(self.board)
-                        temp_board.apply_move(Move(temp_board.grid[line][column], temp_board.grid[line][column + (i + 1) * direction]))
+                        temp_board.apply_move(Move(temp_board.grid[position.line][position.column], 
+                                                   temp_board.grid[position.line][position.column + (i + 1) * direction]))
 
                         if temp_board.is_checked(king.piece_color):
                             case_between_king_and_rook_is_not_checked = False
                             break
 
                     if case_between_king_and_rook_is_empty and case_between_king_and_rook_is_not_checked:
-                        castling_moves.append(self.board.grid[line][column + 2 * direction])
+                        castling_moves.append(self.board.grid[position.line][position.column + 2 * direction])
 
         return castling_moves
 
-    def get_en_passant_moves(self, line: int, column: int) -> list[Case]:
-        is_valid_position(line, column, "get_en_passant_moves(self, line, column)")
-
+    def get_en_passant_moves(self, position: Position) -> list[Case]:
         en_passant_moves: list[Case] = []
-        actual_case: Case = self.board.grid[line][column]
+        actual_case: Case = self.board.grid[position.line][position.column]
 
         if isinstance(actual_case.content, Pawn) and self.moves:
             last_move: Move = self.moves[-1]
-            last_move_end_case: Case = self.board.grid[last_move.end.line][last_move.end.column]
+            last_move_end_case: Case = self.board.grid[last_move.end_case.position.line][last_move.end_case.position.column]
 
             if (isinstance(last_move_end_case.content, Pawn) and
             last_move_end_case.content.piece_color != actual_case.content.piece_color and
-            abs(last_move.start.line - last_move.end.line) == 2 and
+            abs(last_move.start_case.position.line - last_move.end_case.position.line) == 2 and
             last_move.end.line == line and abs(last_move.end.column - column) == 1):
                 end_case: Case = self.board.grid[line + (1 if actual_case.content.piece_color == PieceColor.WHITE else -1)][last_move.end.column]
 

@@ -19,24 +19,24 @@ class SpecialMove(Enum):
 
 @dataclass
 class Move:
-    start: Case
-    end: Case
+    start_case: Case
+    end_case: Case
     special_move: SpecialMove = SpecialMove.NONE
     promotion_piece_type: None | type[Bishop|Knight|Queen|Rook] = None
     captured_piece: None | Piece = None
 
 
     def __post_init__(self) -> None:
-        if not isinstance(self.start, Case):
+        if not isinstance(self.start_case, Case):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut start doit être du type Case.")
 
-        if not isinstance(self.start.content, Piece):
+        if not isinstance(self.start_case.content, Piece):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) La Case contenue dans start doit contenir une Piece.")
 
-        if not isinstance(self.end, Case):
+        if not isinstance(self.end_case, Case):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut end doit être du type Case.")
 
-        self.moving_piece: Piece = self.start.content
+        self.moving_piece: Piece = self.start_case.content
 
         if not isinstance(self.moving_piece, Piece):
             raise TypeError("Move(start, end, special_move, promotion_piece_type, captured_piece) L'attribut moving_piece doit être du type Piece.")

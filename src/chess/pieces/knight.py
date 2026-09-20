@@ -1,6 +1,5 @@
-from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.piece import Piece, PieceColor
-from src.chess.utils import is_valid_position
+from src.chess.position import Position
 
 
 
@@ -9,17 +8,12 @@ class Knight(Piece):
         super().__init__(color)
 
 
-    def get_moves(self, line: int, column: int) -> list[tuple[int, int]]:
-        is_valid_position(line, column, "get_moves(self, line, column)")
-
-        list_of_possible_moves: list[tuple[int, int]] = []
+    def get_positions(self, position: Position) -> list[Position]:
+        list_of_possible_moves: list[Position] = []
         # "offset" désigne un mouvement/direction possible de la pièce
         offsets: list[tuple[int, int]] = [(1, 2), (2, 1), (-1, 2), (-2, 1), (1, -2), (2, -1), (-1, -2), (-2, -1)]
 
         for offset in offsets:
-            new_position: tuple[int, int] = (line + offset[0], column + offset[1])
-
-            if 0 <= new_position[0] < BOARD_SIZE and 0 <= new_position[1] < BOARD_SIZE:
-                list_of_possible_moves.append(new_position)
+            list_of_possible_moves.append(Position(position.line + offset[0], position.column + offset[1]))
 
         return list_of_possible_moves
