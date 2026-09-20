@@ -67,6 +67,10 @@ class Piece(ABC):
     def __repr__(self) -> str:
         return f"{type(self).__name__}[color: {self.piece_color.value}, has_moved: {self.has_moved}]"
 
+
+    def __eq__(self, value):
+        return type(self).__name__ == type(value).__name__ and self.piece_color == value.piece_color
+
     
     @abstractmethod
     def get_reachable_positions_from_position(self, position: Position) -> list[Position]:

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from src.chess.constants import BOARD_SIZE
 from src.chess.exceptions.illegal_position_error import IllegalPositionError
+from src.chess.utils import verify_type
 
 
 
@@ -11,11 +12,8 @@ class Position:
 
 
     def __post_init__(self):
-        if not isinstance(self.line, int):
-            raise TypeError("Position(line, column) L'atribut line doit être du type int.")
-
-        if not isinstance(self.column, int):
-            raise TypeError("Position(line, column) L'atribut column doit être du type int.")
+        verify_type(self.line, int, "Position(line, column)", "line")
+        verify_type(self.column, int, "Position(line, column)", "column")
         
         if not 0 <= self.line < BOARD_SIZE:
             raise IllegalPositionError(f"Position(line, column) L'attribut line doit être supérieur ou égal à 0 et inférieur à {BOARD_SIZE}.")
