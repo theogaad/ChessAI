@@ -8,7 +8,7 @@ class King(Piece):
     """Classe représentant un Roi, descendant de la classe abstraite Piece.
         
     piece_color (private) -- couleur de la pièce
-    has_moved (private) -- permet de savoir si la pièce a déjà bougé
+    has_moved (private) -- permet de savoir si la pièce a déjà bougé (par défault False)
     """
     def __init__(self, color: PieceColor) -> None:
         """Initialise un King avec une couleur donnée, has_moved est à False à la création."""
@@ -16,7 +16,7 @@ class King(Piece):
 
 
     def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
-        """Calcule les positions atteignables par la Piece en fonction de son type et de sa position.
+        """Calcule les positions atteignables par le King en fonction de sa position.
                         
         position -- position de départ
         Renvoie une liste de Position.

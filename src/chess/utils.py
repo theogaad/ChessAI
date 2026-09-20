@@ -1,5 +1,5 @@
 def verify_type(obj_to_verify: object, type: type, function_name: str, variable_name: str) -> None:
-    """Fonction vérifiant le type d'un object et renvoyant une erreur si le type ne correspond pas.
+    """Fonction vérifiant le type d'un object et invoquant une erreur si le type ne correspond pas.
     
     obj_to_verify -- object quelconque dont on va vérifier le type
     type -- type que obj_to_verify doit avoir

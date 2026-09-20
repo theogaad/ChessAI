@@ -8,7 +8,7 @@ class Pawn(Piece):
     """Classe représentant un Pion, descendant de la classe abstraite Piece.
         
     piece_color (private) -- couleur de la pièce
-    has_moved (private) -- permet de savoir si la pièce a déjà bougé
+    has_moved (private) -- permet de savoir si la pièce a déjà bougé (par défault False)
     """
     def __init__(self, color: PieceColor) -> None:
         """Initialise un Pawn avec une couleur donnée, has_moved est à False à la création."""
@@ -16,7 +16,7 @@ class Pawn(Piece):
 
 
     def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
-        """Calcule les positions atteignables par la Piece en fonction de son type et de sa position.
+        """Calcule les positions atteignables par le Pawn en fonction de sa position, sa couleur et l'attribut has_moved.
                         
         position -- position de départ
         Renvoie une liste de Position.

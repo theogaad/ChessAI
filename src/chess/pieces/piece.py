@@ -18,7 +18,7 @@ class Piece(ABC):
     """ Classe abstraite représentant une pièce d'échecs.
     
     piece_color (private) -- couleur de la pièce
-    has_moved (private) -- permet de savoir si la pièce a déjà bougé
+    has_moved (private) -- permet de savoir si la pièce a déjà bougé (par défault False)
     """
     def __init__(self, color: PieceColor) -> None:
         """Initialise une Piece avec une couleur donnée, has_moved est à False à la création."""
@@ -28,32 +28,14 @@ class Piece(ABC):
         self.__has_moved: bool = False
 
 
-    @property
-    def piece_color(self) -> PieceColor:
-        """Renvoie la couleur de la Piece."""
-        return self.__piece_color
-
-
-    @piece_color.setter
-    def piece_color(self, new_piece_color: PieceColor) -> None:
-        """Modifie la couleur de la Piece."""
-        verify_type(new_piece_color, PieceColor, "piece_color(new_piece_color)", "new_piece_color")
-
-        self.__piece_color = new_piece_color
-
-
-    @property
-    def has_moved(self) -> bool:
-        """Renvoie l'attribut has_moved."""
-        return self.__has_moved
-
-
-    @has_moved.setter
-    def has_moved(self, new_has_moved: bool) -> None:
-        """Modifie l'attribut has_moved."""
-        verify_type(new_has_moved, bool, "set_has_moved(new_has_moved)", "new_has_moved")
-
-        self.__has_moved = new_has_moved
+    @abstractmethod
+    def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
+        """Calcule les positions atteignables par la Piece en fonction de son type et de sa position.
+        
+        position -- position de départ
+        Renvoie une liste de Position.
+        """
+        pass
 
 
     def get_reachable_sliding_positions_from_position(self, position: Position, directions: list[tuple[int, int]]) -> list[Position]:
@@ -87,12 +69,27 @@ class Piece(ABC):
         """Compare le type des Piece et leur couleur, renvoie leur égalité."""
         return type(self).__name__ == type(value).__name__ and self.piece_color == value.piece_color
 
-    
-    @abstractmethod
-    def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
-        """Calcule les positions atteignables par la Piece en fonction de son type et de sa position.
-        
-        position -- position de départ
-        Renvoie une liste de Position.
-        """
-        pass
+
+    @property
+    def piece_color(self) -> PieceColor:
+        """Renvoie la couleur de la Piece."""
+        return self.__piece_color
+
+    @piece_color.setter
+    def piece_color(self, new_piece_color: PieceColor) -> None:
+        """Modifie la couleur de la Piece."""
+        verify_type(new_piece_color, PieceColor, "piece_color(new_piece_color)", "new_piece_color")
+
+        self.__piece_color = new_piece_color
+
+    @property
+    def has_moved(self) -> bool:
+        """Renvoie l'attribut has_moved."""
+        return self.__has_moved
+
+    @has_moved.setter
+    def has_moved(self, new_has_moved: bool) -> None:
+        """Modifie l'attribut has_moved."""
+        verify_type(new_has_moved, bool, "set_has_moved(new_has_moved)", "new_has_moved")
+
+        self.__has_moved = new_has_moved
