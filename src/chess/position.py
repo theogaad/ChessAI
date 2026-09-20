@@ -7,7 +7,11 @@ from src.chess.utils import verify_type
 
 @dataclass
 class Position:
-    """Classe représentant une position valide dans un plateau d'échecs."""
+    """Dataclass représentant une position valide dans un plateau d'échecs.
+    
+    line (public) -- valeur de la verticalité
+    column (public) -- valeur de l'horizontalité
+    """
     line: int
     column: int
 

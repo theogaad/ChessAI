@@ -17,9 +17,8 @@ class PieceColor(Enum):
 class Piece(ABC):
     """ Classe abstraite représentant une pièce d'échecs.
     
-    piece_color -- couleur de la pièce
-    has_moved -- permet de savoir si la pièce a déjà bougé
-    Les deux attributs sont privés.
+    piece_color (private) -- couleur de la pièce
+    has_moved (private) -- permet de savoir si la pièce a déjà bougé
     """
     def __init__(self, color: PieceColor) -> None:
         """Initialise une Piece avec une couleur donnée, has_moved est à False à la création."""

@@ -7,9 +7,8 @@ from src.chess.utils import verify_type
 class Rook(Piece):
     """Classe représentant une Tour, descendant de la classe abstraite Piece.
         
-    piece_color -- couleur de la pièce
-    has_moved -- permet de savoir si la pièce a déjà bougé
-    Les deux attributs sont privés.
+    piece_color (private) -- couleur de la pièce
+    has_moved (private) -- permet de savoir si la pièce a déjà bougé
     """
     def __init__(self, color: PieceColor) -> None:
         """Initialise un Rook avec une couleur donnée, has_moved est à False à la création."""
