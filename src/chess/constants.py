@@ -1,6 +1,6 @@
-BOARD_SIZE: int = 8 # Nombre de cases d'un plateau d'échecs
+BOARD_SIZE: int = 8 # Nombre de lignes/colonnes dans un plateau d'échecs
 
-CASE_SIZE: int = 100 # Taille d'une case dans pygame en pixels
+CASE_SIZE: int = 100 # Taille d'une case en pixels dans pygame
 
 # Valeurs des pièces
 PAWN_VALUE: int = 1
