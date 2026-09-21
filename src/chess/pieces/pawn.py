@@ -20,7 +20,7 @@ class Pawn(Piece):
         """Détermine les positions atteignables par un pion depuis la position donnée.
 
         Contrairement aux autres types de pièce, les positions atteignables d'un pion dépendent aussi de sa couleur
-        et de l'attribut ``has_moved``.
+        et de la propriété ``has_moved``.
                 
         Args:
             position: Position de départ.

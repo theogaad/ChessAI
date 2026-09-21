@@ -12,6 +12,8 @@ from src.chess.position import Position
 from src.chess.utils import BOARD_SIZE, WHITE, BLACK, verify_type
 
 
+
+# Constante représentant l'état initial d'un échiquier.
 INITIAL_BOARD: list[list[None | Piece]] = \
 [
     [Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE), King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)],
@@ -27,6 +29,7 @@ INITIAL_BOARD: list[list[None | Piece]] = \
 
 
 class Board:
+    # TODO : Ajouter les dernières méthodes et faire la doc.
     """Représente un échiquier de 8x8 Case."""
     def __init__(self) -> None:
         self.__grid: list[list[Case]] = [[Case(Position(i, j)) for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]

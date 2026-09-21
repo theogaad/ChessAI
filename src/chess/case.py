@@ -7,52 +7,84 @@ from src.chess.utils import verify_type
 
 @dataclass
 class Case:
-    """Dataclass représentant une case dans un plateau d'échecs.
+    """Représente une case d'un échiquier.
     
-    position (private) -- position de la case dans le plateau
-    content (private) -- contenu de la case : vide ou éventuellement une Piece (par défault None)
+    Attributes:
+        position: Position actuelle dans l'échiquier.
+        content: Contenu de la case.
     """
     __position: Position
     __content: None | Piece = None
 
 
     def __post_init__(self):
-        """Vérifie le type des attributs."""
-        verify_type(self.position, Position, "Case(position)", "position")
+        """Vérifie le type des propriétés.
+        
+        Raises:
+            TypeError: Si les propriétés ne sont pas du type attendu.
+        """
+        verify_type(self.position, Position, "Case(position, content=None)", "position")
+        verify_type(self.content, Piece, "Case(position, content=None)", "content", or_none=True)
 
-        if not isinstance(self.content, Piece) and self.content is not None:
-            raise TypeError("Case(position, content) Le paramètre content doit être du type None ou Piece.")
+
+    def contains_a_piece(self) -> bool:
+        """Indique si le contenu de la case est une pièce."""
+        return isinstance(self.content, Piece)
 
 
     def __repr__(self) -> str:
-        """Définis la représentation en chaîne de caractères d'une Case."""
+        """Retourne la représentation textuelle d'une case."""
         return f"Case[{self.position}, {self.content}]"
 
 
-    def __eq__(self, value) -> bool:
+    def __eq__(self, value: object) -> bool:
+        """Compare cette case à un objet selon leur position.
+        
+        La propriété ``content`` n'est pas utilisée dans la comparaison.
+
+        Returns:
+            Un booléen indiquant l'égalité entre cette case et l'objet.
+        """
+        if not isinstance(value, Case):
+            return False
+        
         return self.position == value.position
 
 
     @property
     def position(self) -> Position:
-        """Renvoie la position de la Case."""
+        """Retourne la position actuelle de la case."""
         return self.__position
 
     @position.setter
     def position(self, new_position: Position):
-        """Modifie la position de la Case."""
+        """Modifie la position de la case.
+        
+        Args:
+            new_position: Nouvelle position de la case.
+
+        Raises:
+            TypeError: Si ``new_position`` n'est pas une instance de ``Position``.
+        """
         verify_type(new_position, Position, "position(new_position)", "new_position")
 
         self.__position = new_position
 
     @property
     def content(self) -> None | Piece:
-        """Renvoie le contenu de la Case."""
+        """Retourne le contenu actuel de la Case."""
         return self.__content
 
     @content.setter
     def content(self, new_content: None | Piece):
-        """Modifie le contenu de la Case."""
-        verify_type(new_content, Piece, "content(new_content)", "new_content", or_none=True)
+        """Modifie le contenu de la case.
         
+        Args:
+            new_content: Nouveau contenu de la case.
+        
+        Raises:
+            TypeError: Si ``new_content`` n'est ni de type ``None`` ni une instance de ``Piece``.
+        """
+        verify_type(new_content, Piece, "content(new_content)", "new_content", or_none=True)
+
         self.__content = new_content
