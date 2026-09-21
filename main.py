@@ -14,5 +14,5 @@ move2: Move = Move(case2, case1)
 print(move1)
 print(move2)
 
-if case1.content:
-    case1.content.get_reachable_positions_from_position(case1.position)
+if case2.content:
+    case2.content.get_reachable_positions_from_position(case2.position)

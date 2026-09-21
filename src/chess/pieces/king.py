@@ -1,3 +1,4 @@
+from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
 from src.chess.utils import PieceColor, verify_type
@@ -27,6 +28,7 @@ class King(Piece):
         directions: list[tuple[int, int]] = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
         for direction in directions:
-            list_of_positions.append(Position(position.line + direction[0], position.column + direction[1]))
+            if 0 <= position.line + direction[0] <BOARD_SIZE and 0 <= position.column + direction[1] < BOARD_SIZE:
+                list_of_positions.append(Position(position.line + direction[0], position.column + direction[1]))
                 
         return list_of_positions
