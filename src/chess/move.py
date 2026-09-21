@@ -31,15 +31,10 @@ class Move:
         verify_type(self.start_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "start_case")
         verify_type(self.end_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case")
         verify_type(self.move_type, MoveType, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "move_type")
+        verify_type(self.promotion_piece_type, (Bishop, Knight, Queen, Rook), "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "promotion_piece_type", or_none=True)
+        verify_type(self.end_case.content, Piece, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case.content")
 
-        if not (self.promotion_piece_type is None or 
-                self.promotion_piece_type in (Bishop, Knight, Queen, Rook)):
-            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre promotion_piece_type doit être du type None, Bishop, Knight, Queen ou Rook.")
-
-        if not (self.end_case.content is None or
-                isinstance(self.end_case.content, Piece)):
-            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre end_case.content doit être du type None ou Piece.")
-
+        # Obligé de garder cette vérification sous la forme if isinstance pour pouvoir configurer moving_piece
         if not isinstance(self.start_case.content, Piece):
             raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre start_case.content doit être du type Piece.")
 
@@ -96,9 +91,7 @@ class Move:
     @promotion_piece_type.setter
     def promotion_piece_type(self, new_promotion_piece_type: None | type[Bishop | Knight | Queen | Rook]) -> None:
         """Modifie le type de Piece d'une éventuelle promotion."""
-        if not (new_promotion_piece_type in (Bishop, Knight, Queen, Rook) or 
-                new_promotion_piece_type is None):
-            raise TypeError("promotion_piece_type(new_promotion_piece_type) Le paramètre new_promotion_piece_type doit être du type None, Bishop, Knight, Queen ou Rook.")
+        verify_type(new_promotion_piece_type, (Bishop, Knight, Queen, Rook), "promotion_piece_type(new_promotion_piece_type)", "new_promotion_piece_type", or_none=True)
 
         self.__promotion_piece_type = new_promotion_piece_type
 
@@ -110,9 +103,7 @@ class Move:
     @captured_piece.setter
     def captured_piece(self, new_captured_piece) -> None:
         """Modifie une éventuelle Piece capturée."""
-        if not (isinstance(new_captured_piece, Piece) or 
-                self.captured_piece is None):
-            raise TypeError("capture_piece(new_captured_piece) Le paramètre new_captured_piece doit être du type None ou Piece.")
+        verify_type(new_captured_piece, Piece, "capture_piece(new_captured_piece)", "new_captured_piece", or_none=True)
 
         self.__captured_piece = new_captured_piece
 

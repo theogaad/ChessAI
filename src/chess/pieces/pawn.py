@@ -1,31 +1,40 @@
-from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import PieceColor, verify_type
+from src.chess.utils import PieceColor, BOARD_SIZE, verify_type
 
 
 
 class Pawn(Piece):
-    """Classe représentant un Pion, descendant de la classe abstraite Piece.
+    """Représente un pion, hérite de la classe abstraite ``Piece``.
         
-    piece_color (private) -- couleur de la pièce
-    has_moved (private) -- permet de savoir si la pièce a déjà bougé (par défault False)
+    Attributes:
+        piece_color: Couleur de la pièce.
+        has_moved: Indique si la pièce a déjà été déplacée.
     """
     def __init__(self, color: PieceColor) -> None:
-        """Initialise un Pawn avec une couleur donnée, has_moved est à False à la création."""
+        """Initialise un pion en utilisant le constructeur de la classe ``Piece``."""
         super().__init__(color)
 
 
     def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
-        """Calcule les positions atteignables par le Pawn en fonction de sa position, sa couleur et l'attribut has_moved.
-                        
-        position -- position de départ
-        Renvoie une liste de Position.
+        """Détermine les positions atteignables par un pion depuis la position donnée.
+
+        Contrairement aux autres types de pièce, les positions atteignables d'un pion dépendent aussi de sa couleur
+        et de l'attribut ``has_moved``.
+                
+        Args:
+            position: Position de départ.
+
+        Returns:
+            Positions qu'un pion peut atteindre depuis la position donnée.
+
+        Raises:
+            TypeError: Si ``position`` n'est pas une instance de ``Position``.
         """
         verify_type(position, Position, "get_reachable_positions_from_position(position)", "position")
 
         list_of_positions: list[Position] = []
-        pawn_direction: int = 1 if self.piece_color == PieceColor.WHITE else -1 # Direction verticale du Pawn en fonction de sa couleur
+        pawn_direction: int = 1 if self.is_white() else -1 # Direction verticale du pion en fonction de sa couleur
         directions: list[tuple[int, int]] = [(1 * pawn_direction, 0), (1 * pawn_direction, 1), (1 * pawn_direction, -1)]
 
         if not self.has_moved:

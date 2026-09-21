@@ -1,26 +1,32 @@
-from src.chess.constants import BOARD_SIZE
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import PieceColor, verify_type
+from src.chess.utils import PieceColor, BOARD_SIZE, verify_type
 
 
 
 class Knight(Piece):
-    """Classe représentant un Cavalier.
+    """Représente un cavalier, hérite de la classe abstraite ``Piece``.
         
-    piece_color (private) -- couleur de la pièce
-    has_moved (private) -- permet de savoir si la pièce a déjà bougé (par défault False)
+    Attributes:
+        piece_color: Couleur de la pièce.
+        has_moved: Indique si la pièce a déjà été déplacée.
     """
     def __init__(self, color: PieceColor) -> None:
-        """Initialise un Knight avec une couleur donnée, has_moved est à False à la création."""
+        """Initialise un cavalier en utilisant le constructeur de la classe ``Piece``."""
         super().__init__(color)
 
 
     def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
-        """Calcule les positions atteignables par le Knight en fonction de sa position.
-                        
-        position -- position de départ
-        Renvoie une liste de Position.
+        """Détermine les positions atteignables par un cavalier depuis la position donnée.
+                
+        Args:
+            position: Position de départ.
+
+        Returns:
+            Positions qu'un cavalier peut atteindre depuis la position donnée.
+
+        Raises:
+            TypeError: Si ``position`` n'est pas une instance de ``Position``.
         """
         verify_type(position, Position, "get_reachable_positions_from_position(position)", "position")
 

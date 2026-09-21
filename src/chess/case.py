@@ -53,7 +53,6 @@ class Case:
     @content.setter
     def content(self, new_content: None | Piece):
         """Modifie le contenu de la Case."""
-        if not isinstance(new_content, Piece) and new_content is not None:
-            raise TypeError("content(new_content) Le paramètre new_content doit être du type None ou Piece.")
-
+        verify_type(new_content, Piece, "content(new_content)", "new_content", or_none=True)
+        
         self.__content = new_content
