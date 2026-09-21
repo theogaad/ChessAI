@@ -1,6 +1,6 @@
-from src.chess.pieces.piece import Piece, PieceColor
+from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import verify_type
+from src.chess.utils import PieceColor, verify_type
 
 
 

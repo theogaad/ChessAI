@@ -1,21 +1,11 @@
 from dataclasses import dataclass
-from enum import Enum
 from src.chess.case import Case
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.knight import Knight
 from src.chess.pieces.piece import Piece
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
-from src.chess.utils import verify_type
-
-
-
-class MoveType(Enum):
-    """Enum représentant les différents type de Move possibles."""
-    NORMAL = "normal"
-    CASTLING = "roque"
-    PROMOTION = "promotion"
-    EN_PASSANT = "en passant"
+from src.chess.utils import MoveType, verify_type
 
 
 

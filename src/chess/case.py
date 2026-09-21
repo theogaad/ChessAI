@@ -5,7 +5,6 @@ from src.chess.utils import verify_type
 
 
 
-# Classe représentant une case d'échecs, contenant sa position et éventuellement une pièce
 @dataclass
 class Case:
     """Dataclass représentant une case dans un plateau d'échecs.

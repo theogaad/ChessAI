@@ -14,3 +14,4 @@ class Player(ABC):
         
         self.profile: Profile = profile
         self.color: PieceColor = color
+        self.board_value: int # Valeur combinée de toutes les Piece du Player

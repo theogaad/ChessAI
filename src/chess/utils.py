@@ -1,3 +1,27 @@
+from enum import Enum
+
+
+
+# Enums
+class PieceColor(Enum):
+    """Enum représentant les deux couleurs possibles au échecs."""
+    WHITE = "White"
+    BLACK = "Black"
+
+class MoveType(Enum):
+    """Enum représentant les différents type de Move possibles."""
+    NORMAL = "Normal"
+    CASTLING = "Castling"
+    PROMOTION = "Promotion"
+    EN_PASSANT = "En passant"
+
+class DrawType(Enum):
+    """Enum représentant les différents type de draw possibles."""
+    STALEMATE = "Stalemate"
+    REPETITION = "Repetition"
+    INSUFFICIENT_MATERIAL = "Insufficient material"
+
+# Fonctions
 def verify_type(obj_to_verify: object, type: type, function_name: str, variable_name: str) -> None:
     """Fonction vérifiant le type d'un object et invoquant une erreur si le type ne correspond pas.
     

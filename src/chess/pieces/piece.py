@@ -1,16 +1,7 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from src.chess.constants import BOARD_SIZE
 from src.chess.position import Position
-from src.chess.utils import verify_type
-
-
-
-# Enum des couleurs de pièces
-class PieceColor(Enum):
-    """Enum représantant les deux couleurs possibles au échecs."""
-    WHITE = "White"
-    BLACK = "Black"
+from src.chess.utils import PieceColor, verify_type
 
 
 
@@ -45,12 +36,16 @@ class Piece(ABC):
         directions -- liste des directions
         Renvoie une liste de Position.
         """
-        verify_type(position, Position, "get_sliding_positions(position, offsets)", "position")
-        verify_type(directions, list[tuple[int, int]], "get_sliding_positions(position, offsets)", "offsets")
+        verify_type(position, Position, "get_sliding_positions(position, directions)", "position")
+        verify_type(directions, list, "get_sliding_positions(position, directions)", "offsets")
 
         list_of_positions: list[Position] = []
 
         for direction in directions:
+            verify_type(direction, tuple, "get_sliding_positions(position, directions)", "directions[x]")
+            for obj in direction:
+                verify_type(obj, int, "get_sliding_positions(position, directions)", "directions[x][x]")
+
             i = 1
             
             while 0 <= position.line + direction[0] * i < BOARD_SIZE and 0 <= position.column + direction[1] * i < BOARD_SIZE:
