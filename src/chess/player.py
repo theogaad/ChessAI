@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from random import choice
 from src.chess.board import Board
 from src.chess.profile import Profile
-from src.chess.utils import PieceColor, verify_type
+from src.chess.utils import PieceColor, WHITE, BLACK, verify_type, get_opposite_color
 
 
 
@@ -39,6 +40,16 @@ class Player:
         verify_type(board, Board, "update_board_value(board)", "board")
 
         self.board_value = board.get_board_value_of_color(self.color)
+
+
+    def set_random_color(self, obj: object = None):
+        verify_type(obj, Player, "set_random_color(obj=None)", "obj", or_none=True)
+
+        if isinstance(obj, Player):
+            self.color = get_opposite_color(obj.color)
+
+        else:
+            self.color = choice([WHITE, BLACK])
 
 
     @property
