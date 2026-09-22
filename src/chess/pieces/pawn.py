@@ -1,6 +1,6 @@
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import PieceColor, BOARD_SIZE, verify_type
+from src.chess.utils import PieceColor, BOARD_SIZE, PAWN_VALUE, WHITE, verify_type
 
 
 
@@ -34,7 +34,7 @@ class Pawn(Piece):
         verify_type(position, Position, "get_reachable_positions_from_position(position)", "position")
 
         list_of_positions: list[Position] = []
-        pawn_direction: int = 1 if self.is_white() else -1 # Direction verticale du pion en fonction de sa couleur
+        pawn_direction: int = 1 if self.is_color(WHITE) else -1 # Direction verticale du pion en fonction de sa couleur
         directions: list[tuple[int, int]] = [(1 * pawn_direction, 0), (1 * pawn_direction, 1), (1 * pawn_direction, -1)]
 
         if not self.has_moved:
@@ -45,3 +45,8 @@ class Pawn(Piece):
                 list_of_positions.append(Position(position.line + direction[0], position.column + direction[1]))
 
         return list_of_positions
+
+
+    def get_value(self) -> int:
+        """Retourne la valeur d'un pion."""
+        return PAWN_VALUE

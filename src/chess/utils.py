@@ -30,6 +30,7 @@ CASE_SIZE: int = 100 # Taille d'une case en pixels dans pygame
 # Valeurs des pièces
 PAWN_VALUE: int = 1
 BISHOP_VALUE: int = 3
+KING_VALUE: int = 0
 KNIGHT_VALUE: int = 3
 ROOK_VALUE: int = 5
 QUEEN_VALUE: int = 13

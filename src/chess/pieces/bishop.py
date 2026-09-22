@@ -1,6 +1,6 @@
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import PieceColor, verify_type
+from src.chess.utils import PieceColor, BISHOP_VALUE, verify_type
 
 
 
@@ -34,3 +34,8 @@ class Bishop(Piece):
         list_of_positions: list[Position] = self.get_reachable_sliding_positions_from_position(position, directions)
         
         return list_of_positions
+
+
+    def get_value(self) -> int:
+        """Retourne la valeur d'un fou."""
+        return BISHOP_VALUE

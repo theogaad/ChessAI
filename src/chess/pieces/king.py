@@ -1,6 +1,6 @@
 from src.chess.pieces.piece import Piece
 from src.chess.position import Position
-from src.chess.utils import PieceColor, BOARD_SIZE, verify_type
+from src.chess.utils import PieceColor, BOARD_SIZE, KING_VALUE, verify_type
 
 
 
@@ -38,3 +38,8 @@ class King(Piece):
                 list_of_positions.append(Position(position.line + direction[0], position.column + direction[1]))
                 
         return list_of_positions
+
+
+    def get_value(self) -> int:
+        """Retourne la valeur d'un roi."""
+        return KING_VALUE

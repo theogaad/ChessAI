@@ -113,6 +113,21 @@ class Board:
         return piece_reachable_cases
 
 
+    def get_board_value_of_color(self, color: PieceColor):
+        """Retourne la valeur de toute les pièce de la couleur donnée.
+        
+        Raises:
+            TypeError: Si ``color`` n'est pas une instance de ``PieceColor``.
+        """
+        value: int = 0
+
+        for case in self.get_cases_of_piece_type_and_color((Bishop, King, Knight, Pawn, Queen, Rook), color):
+            if isinstance(case.content, Piece):
+                value += case.content.get_value()
+
+        return value
+    
+
     def apply_move(self, move: Move) -> None:
         """Modifie l'échiquier pour appliquer le mouvement donné."""
         move.end_case.content = move.start_case.content
@@ -169,7 +184,6 @@ class Board:
         return attacked_cases_by_color
 
 
-    # TODO: Vérifier l'utilité de cette méthode, la supprimer si elle ne sert à rien.
     def get_reachable_cases_of_color(self, color: PieceColor) -> list[Case]:
         """Détermine toutes les cases atteignables par les pièces de la couleur donnée.
         

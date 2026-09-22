@@ -43,6 +43,11 @@ class Piece(ABC):
         pass
 
 
+    @abstractmethod
+    def get_value(self) -> int:
+        """Retourne la valeur de la pièce selon son type."""
+
+
     def get_reachable_sliding_positions_from_position(
             self, 
             position: Position, 
