@@ -86,13 +86,23 @@ class Piece(ABC):
         return list_of_positions
 
 
-    def is_white(self) -> bool:
-        """Indique si la couleur de la pièce est blanche."""
-        return self.piece_color == PieceColor.WHITE
+    def is_color(self, color: PieceColor) -> bool:
+        """Indique si la couleur de cette pièce est la même que la couleur donnée.
+        
+        Raises:
+            TypeError: Si ``color`` n'est pas une instance de ``PieceColor``.
+        """
+        verify_type(color, PieceColor, "is_color(color)", "color")
+
+        return self.piece_color == color
 
 
     def has_the_same_color(self, obj: object) -> bool:
-        """Indique si la cette pièce et la pièce donnée sont de la même couleur."""
+        """Indique si la cette pièce et la pièce donnée sont de la même couleur.
+        
+        Raises:
+            TypeError: Si ``obj`` n'est pas une instance de ``Piece``.
+        """
         if not isinstance(obj, Piece):
             raise TypeError("has_the_same_color(obj) Le paramètre obj doit être du type 'Piece'.")
 

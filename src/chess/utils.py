@@ -97,3 +97,17 @@ def verify_type(
         
     if not isinstance(obj_to_verify, expected_types) and not (or_none and obj_to_verify is None):
         raise TypeError(f"{function_name} Le paramètre {variable_name} doit être {message}")
+
+
+def get_opposite_color(color: PieceColor):
+    """Retourne la couleur opposée à la couleur donnée.
+    
+    Raises:
+        TypeError: Si color n'est pas une instance de PieceColor.
+    """
+    verify_type(color, PieceColor, "get_opposite_color(color)", "color")
+
+    if color == PieceColor.WHITE:
+        return PieceColor.BLACK
+
+    return PieceColor.BLACK

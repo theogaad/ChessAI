@@ -9,7 +9,7 @@ from src.chess.pieces.piece import Piece
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
 from src.chess.position import Position
-from src.chess.utils import BOARD_SIZE, WHITE, BLACK, verify_type
+from src.chess.utils import BOARD_SIZE, WHITE, BLACK, PieceColor, verify_type, get_opposite_color
 
 
 
@@ -29,10 +29,6 @@ INITIAL_BOARD: list[list[None | Piece]] = \
 
 
 class Board:
-    # TODO Ajouter la méthode get_reachable_cases_of_color(self, color).
-    # TODO Ajouter la méthode get_attacked_cases_by_color(self, color).
-    # TODO Ajouter la méthode get_piece_type_case(self, piece_type, color).
-    # TODO Ajouter la méthode is_check(self, color).
     """Représente un échiquier.
     
     Attributes:
@@ -44,7 +40,17 @@ class Board:
 
 
     def get_reachable_cases_from_position(self, position: Position) -> list[Case]:
-        # TODO: Ajouter la documentation.
+        """Retourne les cases atteignables par la pièce à la position donnée.
+        
+        Args:
+            position: Position de départ de la pièce.
+        
+        Returns:
+            Liste de toutes les cases que la pièce située à la position donnée peut atteindre.
+        
+        Raises:
+            TypeError: Si ``position`` n'est pas une instance de ``Position``.
+        """
         verify_type(position, Position, "get_reachable_cases_from_position(position)", "position")
 
         reachable_cases: list[Case] = []
@@ -71,6 +77,11 @@ class Board:
 
         i: int = 0
         case: Case = piece_reachable_cases[i]
+
+        # Pour chaque ``direction``, on boucle sur les positions atteignables tant que les positions 
+        # sont dans la même direction que ``direction``.
+        # Ensuite, tant qu'il n'y a aucun obstacle dans la direction ``direction``, on ajoute la cases
+        # aux cases atteignables, sinon on passe à la direction suivante.
         for direction in directions:
             case = piece_reachable_cases[i]
 
@@ -116,6 +127,71 @@ class Board:
         move.end_case.content = move.captured_piece
 
 
+    def is_check(self, color: PieceColor) -> bool:
+        """Indique si le roi de la couleur donnée est en échec.
+        
+        Raises:
+            TypeError: Si color n'est pas une instance de PieceColor.
+        """
+        verify_type(color, PieceColor, "is_check(color)", "color")
+
+        king_case: Case = self.get_cases_of_piece_type_and_color((King,), color)[0]
+
+        return king_case in self.get_attacked_cases_by_color(get_opposite_color(color))
+
+
+    def get_attacked_cases_by_color(self, color: PieceColor) -> list[Case]:
+        """Détermine toutes les cases qui sont menacées par les pièce de la couleur donnée.
+        
+        Pour les pions, les cases menacées sont les cases se trouvant dans leurs diagonales.
+
+        Args:
+            color: Couleur à partir de laquelle on détermine les cases menacées.
+
+        Returns:
+            Liste de toutes les cases menacées par toutes les pièces de la couleur données.
+        
+        Raises:
+            TypeError: Si ``color`` n'est pas une instance de ``PieceColor``.
+        """
+        verify_type(color, PieceColor, "get_attacked_cases_by_color(color)", "color")
+
+        attacked_cases_by_color: list[Case] = []
+
+        for case in self.get_cases_of_piece_type_and_color((Bishop, King, Knight, Pawn, Queen, Rook), color):
+            if not isinstance(case.content, Pawn):
+                attacked_cases_by_color.extend(self.get_reachable_cases_from_position(case.position))
+            else:
+                for reachable_case in self.get_reachable_cases_from_position(case.position):
+                    if reachable_case.position.get_direction(case.position)[1] != 0:
+                        attacked_cases_by_color.append(reachable_case)
+
+        return attacked_cases_by_color
+
+
+    # TODO: Vérifier l'utilité de cette méthode, la supprimer si elle ne sert à rien.
+    def get_reachable_cases_of_color(self, color: PieceColor) -> list[Case]:
+        """Détermine toutes les cases atteignables par les pièces de la couleur donnée.
+        
+        Args:
+            color: Couleur des pièces dont on détermine les cases atteignables.
+
+        Returns:
+            Liste de toutes les cases atteignables par toutes les pièces de la couleur donnée.
+
+        Raises:
+            TypeError: Si color n'est pas une instance de PieceColor.
+        """
+        verify_type(color, PieceColor, "get_reachable_cases_of_color(color)","color")
+
+        reachable_cases_of_color: list[Case] = []
+
+        for case in self.get_cases_of_piece_type_and_color((Bishop, King, Knight, Pawn, Queen, Rook), color):
+            reachable_cases_of_color.extend(self.get_reachable_cases_from_position(case.position))
+
+        return reachable_cases_of_color
+
+
     def fill(self, new_configuration: list[list[None | Piece]]) -> None:
         """Modifie le contenu de toutes les cases de l'échiquier selon la configuration donnée.
         
@@ -145,16 +221,6 @@ class Board:
                 self.grid[i][j].content = new_configuration[i][j]
 
 
-    def get_case(self, position: Position) -> Case:
-        """Retourne la case de l'échiquier déterminée à partir de la position donnée."""
-        return self.grid[position.line][position.column]
-
-
-    def get_case_content(self, position: Position) -> None | Piece:
-        """Retourne le contenu de la case de l'échiquier déterminée à partir de la position donnée."""
-        return self.get_case(position).content
-
-
     def get_piece(self, position: Position) -> Piece:
         """Retourne la pièce située à la position donnée.
         
@@ -173,6 +239,50 @@ class Board:
             raise TypeError("get_piece(position) La case ne contient pas de pièce.")
 
         return obj
+
+
+    def get_cases_of_piece_type_and_color(
+        self, 
+        piece_types: tuple[type[Piece], ...] | tuple[type[Piece]], 
+        color: PieceColor
+    ) -> list[Case]:
+        """Retourne les cases contenant une pièce d'un des types et de la couleur donnés.
+        
+        Args:
+            piece_types: Tuple contenant les types de pièce recherchés.
+            color: Couleur des pièces recherchées.
+            
+        Returns:
+            Liste des cases contenant une pièces d'un des types donnés et de la couleur données.
+
+        Raises:
+            TypeError: Si ``piece_types`` n'est pas un type hérité de la classe ``Piece``, 
+                ou si ``color`` n'est pas une instance de ``PieceColor``.
+        """
+        if any(piece_type not in [Bishop, King, Knight, Pawn, Queen, Rook] for piece_type in piece_types):
+            raise TypeError("get_cases_of_piece_type_and_color(piece_type, color) Le paramètre piece_type doit être un tuple de types parmi 'Bishop', 'King', 'Knight', 'Pawn', 'Queen', 'Rook'.")
+
+        verify_type(color, PieceColor, "get_cases_of_piece_type_and_color(piece_type, color)", "color")
+
+        list_of_cases: list[Case] = []
+
+        for row in self.grid:
+            for case in row:
+                if isinstance(case.content, piece_types) and isinstance(case.content, Piece) and case.content.is_color(color):
+                    list_of_cases.append(case)
+
+        return list_of_cases
+
+
+
+    def get_case(self, position: Position) -> Case:
+        """Retourne la case de l'échiquier déterminée à partir de la position donnée."""
+        return self.grid[position.line][position.column]
+
+
+    def get_case_content(self, position: Position) -> None | Piece:
+        """Retourne le contenu de la case de l'échiquier déterminée à partir de la position donnée."""
+        return self.get_case(position).content
 
 
     @property
