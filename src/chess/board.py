@@ -39,6 +39,11 @@ class Board:
         self.__grid: list[list[Case]] = [[Case(Position(i, j)) for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]
 
 
+    def __post_init__(self) -> None:
+        """Rempli la grille avec la congifuration de base d'un échiquier."""
+        self.fill(INITIAL_BOARD)
+
+
     def get_reachable_cases_from_position(
         self, 
         position: Position
@@ -257,6 +262,11 @@ class Board:
         for i in range(BOARD_SIZE):
             for j in range(BOARD_SIZE):
                 self.grid[i][j].content = new_configuration[i][j]
+
+
+    def empty_the_board(self) -> None:
+        """Vide toutes les cases de la grille."""
+        self.fill([[None for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)])
 
 
     def get_piece(
