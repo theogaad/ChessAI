@@ -257,7 +257,7 @@ class Board:
 
     def get_cases_of_piece_type_and_color(
         self, 
-        piece_types: tuple[type[Piece], ...] | tuple[type[Piece]], 
+        piece_types: tuple[type[Piece], ...], 
         color: PieceColor
     ) -> list[Case]:
         """Retourne les cases contenant une pièce d'un des types et de la couleur donnés.
