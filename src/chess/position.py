@@ -33,6 +33,22 @@ class Position:
             raise IllegalPositionError(f"Position(line, column) L'attribut column doit être supérieur ou égal à 0 et inférieur à {BOARD_SIZE}.")
 
 
+    def get_direction(self, obj: object) -> tuple[int, int]:
+        """Détermine la direction entre cette position et la position donnée.
+        
+        Args:
+            obj: Position dont on doit déterminer la direction par rapport à cette position.
+        
+        Raises:
+            TypeError: Si ``obj`` n'est pas une instance de ``Position``.
+        """
+        if not isinstance(obj, Position):
+            raise TypeError("get_direction(obj) Le paramètre obj doit être du type 'Position'.")
+
+        # Calcul permettant de ramener les valeurs de la direction à -1, 0 ou 1.
+        return (obj.line > self.line - obj.line < self.line, obj.column > self.column - obj.column < self.column)
+
+
     def __repr__(self) -> str:
         """Retourne la représentation textuelle d'une position."""
         return f"({self.line}, {self.column})"

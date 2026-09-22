@@ -54,7 +54,7 @@ class Piece(ABC):
         
         Args:
             position: Position de départ.
-            directions: Directions de déplacement sous forme de couples ``(ligne, colonne)``.
+            directions: Directions de déplacement sous forme de couples ``(déplacement vertical, déplacement horizontal)``.
 
         Returns:
             La liste des positions situées dans les direction données jusqu'au bord de l'échiquier.
@@ -89,6 +89,14 @@ class Piece(ABC):
     def is_white(self) -> bool:
         """Indique si la couleur de la pièce est blanche."""
         return self.piece_color == PieceColor.WHITE
+
+
+    def has_the_same_color(self, obj: object) -> bool:
+        """Indique si la cette pièce et la pièce donnée sont de la même couleur."""
+        if not isinstance(obj, Piece):
+            raise TypeError("has_the_same_color(obj) Le paramètre obj doit être du type 'Piece'.")
+
+        return self.piece_color == obj.piece_color
 
 
     def __repr__(self) -> str:

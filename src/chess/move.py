@@ -41,8 +41,6 @@ class Move:
         verify_type(self.promotion_piece_type, (Bishop, Knight, Queen, Rook), "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "promotion_piece_type", or_none=True)
         verify_type(self.end_case.content, Piece, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case.content")
 
-        # Obligé de garder cette vérification sous la forme if isinstance() 
-        # pour pouvoir initialiser moving_piece en satisfaisant mypy.
         if not isinstance(self.start_case.content, Piece):
             raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre start_case.content doit être du type Piece.")
 
@@ -114,7 +112,7 @@ class Move:
 
     @property
     def promotion_piece_type(self) -> None | type[Bishop | Knight | Queen | Rook]:
-        """Retourne le type de la pièce effectuant le mouvement après une éventuelle promotion ou 'None'."""
+        """Retourne le type de la pièce effectuant le mouvement après une éventuelle promotion ou ``None``."""
         return self.__promotion_piece_type
 
     @promotion_piece_type.setter
@@ -133,7 +131,7 @@ class Move:
 
     @property
     def captured_piece(self) -> None | Piece:
-        """Retourne une éventuelle pièce capturée ou 'None'."""
+        """Retourne une éventuelle pièce capturée ou ``None``."""
         return self.__captured_piece
 
     @captured_piece.setter
@@ -141,7 +139,7 @@ class Move:
         """Modifie l'éventuelle pièce capturée.
         
         Args:
-            new_captured_piece: Nouvelle pièce capturée ou 'None'.
+            new_captured_piece: Nouvelle pièce capturée ou ``None``.
         
         Raises:
             TypeError: Si ``new_captured_piece`` n'est ni de type ``None`` ni une instance de ``Piece``. 

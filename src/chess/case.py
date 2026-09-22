@@ -27,8 +27,18 @@ class Case:
         verify_type(self.content, Piece, "Case(position, content=None)", "content", or_none=True)
 
 
-    def contains_a_piece(self) -> bool:
-        """Indique si le contenu de la case est une pièce."""
+    def contains_a_piece(self, raise_error: bool = False) -> bool:
+        """Indique si le contenu de la case est une pièce et lève une erreur si demandé et si cette case de contient pas de pièce.
+        
+        Args:
+            raise_error: Indique si on doit lever une erreur dans le cas ou cette case ne contient pas de pièce.
+        
+        Raises:
+            TypeError: Si ``raise_error`` est à ``True`` et que le contenu de cette case n'est pas une pièce.
+        """
+        if raise_error and not isinstance(self.content, Piece):
+            raise TypeError("contains_a_piece(raise_error=False) La case est censée contenir une pièce.")
+        
         return isinstance(self.content, Piece)
 
 
