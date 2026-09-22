@@ -11,7 +11,10 @@ class Piece(ABC):
         piece_color: Couleur de la pièce.
         has_moved: Indique si la pièce a déjà été déplacée.
     """
-    def __init__(self, color: PieceColor) -> None:
+    def __init__(
+        self, 
+        color: PieceColor
+    ) -> None:
         """Initialise une pièce avec la couleur donnée.
         
         La propriété ``has_move`` est initialisée à ``False``
@@ -29,7 +32,10 @@ class Piece(ABC):
 
 
     @abstractmethod
-    def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
+    def get_reachable_positions_from_position(
+        self, 
+        position: Position
+    ) -> list[Position]:
         """Détermine les positions atteignables par la pièce depuis la position donnée.
         
         Cette méthode doit être implémentée par chaque classe représentant un type de pièce.
@@ -49,10 +55,10 @@ class Piece(ABC):
 
 
     def get_reachable_sliding_positions_from_position(
-            self, 
-            position: Position, 
-            directions: list[tuple[int, int]]
-        ) -> list[Position]:
+        self, 
+        position: Position, 
+        directions: list[tuple[int, int]]
+    ) -> list[Position]:
         """Détermine les positions atteignables en suivant les directions données.
 
         Pour chaque direction, les positions sont ajoutées successivement jusqu'à atteindre le bord de l'échiquier.
@@ -91,7 +97,10 @@ class Piece(ABC):
         return list_of_positions
 
 
-    def is_color(self, color: PieceColor) -> bool:
+    def is_color(
+        self, 
+        color: PieceColor
+    ) -> bool:
         """Indique si la couleur de cette pièce est la même que la couleur donnée.
         
         Raises:
@@ -102,7 +111,10 @@ class Piece(ABC):
         return self.piece_color == color
 
 
-    def has_the_same_color(self, obj: object) -> bool:
+    def has_the_same_color(
+        self, 
+        obj: object
+    ) -> bool:
         """Indique si la cette pièce et la pièce donnée sont de la même couleur.
         
         Raises:
@@ -119,7 +131,10 @@ class Piece(ABC):
         return f"{type(self).__name__}[color: {self.piece_color.value}, has_moved: {self.has_moved}]"
 
 
-    def __eq__(self, value: object) -> bool:
+    def __eq__(
+        self, 
+        value: object
+    ) -> bool:
         """Compare cette pièce à un objet selon leur type et leur couleur.
         
         L'état ``has_moved`` n'est pas pris en compte dans la comparaison.
@@ -142,7 +157,10 @@ class Piece(ABC):
         return self._piece_color
 
     @piece_color.setter
-    def piece_color(self, new_piece_color: PieceColor) -> None:
+    def piece_color(
+        self, 
+        new_piece_color: PieceColor
+    ) -> None:
         """Modifie la couleur de la pièce après avoir vérifié son type.
         
         Args:
@@ -161,7 +179,10 @@ class Piece(ABC):
         return self._has_moved
 
     @has_moved.setter
-    def has_moved(self, new_has_moved: bool) -> None:
+    def has_moved(
+        self, 
+        new_has_moved: bool
+    ) -> None:
         """Modifie l'état indiquant si la pièce a déjà été déplacée.
         
         Args:

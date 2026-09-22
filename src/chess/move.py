@@ -59,7 +59,10 @@ class Move:
         return self.__start_case
 
     @start_case.setter
-    def start_case(self, new_start_case: Case) -> None:
+    def start_case(
+        self, 
+        new_start_case: Case
+    ) -> None:
         """Modifie la case de départ.
         
         Args:
@@ -78,7 +81,10 @@ class Move:
         return self.__end_case
 
     @end_case.setter
-    def end_case(self, new_end_case: Case) -> None:
+    def end_case(
+        self, 
+        new_end_case: Case
+    ) -> None:
         """Modifie la case d'arrivée.
 
         Args:
@@ -97,7 +103,10 @@ class Move:
         return self.__move_type
 
     @move_type.setter
-    def move_type(self, new_move_type: MoveType) -> None:
+    def move_type(
+        self, 
+        new_move_type: MoveType
+    ) -> None:
         """Modifie le type du mouvement.
         
         Args:
@@ -116,7 +125,10 @@ class Move:
         return self.__promotion_piece_type
 
     @promotion_piece_type.setter
-    def promotion_piece_type(self, new_promotion_piece_type: None | type[Bishop | Knight | Queen | Rook]) -> None:
+    def promotion_piece_type(
+        self, 
+        new_promotion_piece_type: None | type[Bishop | Knight | Queen | Rook]
+    ) -> None:
         """Modifie le type de la pièce effectuant le mouvement après une éventuelle promotion.
         
         Args:
@@ -135,7 +147,10 @@ class Move:
         return self.__captured_piece
 
     @captured_piece.setter
-    def captured_piece(self, new_captured_piece) -> None:
+    def captured_piece(
+        self, 
+        new_captured_piece
+    ) -> None:
         """Modifie l'éventuelle pièce capturée.
         
         Args:
@@ -154,7 +169,10 @@ class Move:
         return self.__moving_piece
 
     @moving_piece.setter
-    def moving_piece(self, new_moving_piece: Piece):
+    def moving_piece(
+        self, 
+        new_moving_piece: Piece
+    ) -> None:
         """Modifie la pièce qui effectue le mouvement.
         
         Args:

@@ -33,7 +33,10 @@ class Position:
             raise IllegalPositionError(f"Position(line, column) L'attribut column doit être supérieur ou égal à 0 et inférieur à {BOARD_SIZE}.")
 
 
-    def get_direction(self, obj: object) -> tuple[int, int]:
+    def get_direction(
+        self, 
+        obj: object
+    ) -> tuple[int, int]:
         """Détermine la direction entre cette position et la position donnée.
         
         Args:

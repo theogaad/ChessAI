@@ -30,7 +30,10 @@ class Player:
         verify_type(self.board_value, int, "Player(profile, color, board_value=0)", "board_value")
 
 
-    def update_board_value(self, board: Board) -> None:
+    def update_board_value(
+        self, 
+        board: Board
+    ) -> None:
         """Actualise la valeur de la propriété ``board_value`` en fonction des pièces de l'échiquier donné.
 
         Raises:
@@ -47,7 +50,10 @@ class Player:
         return self.__profile
 
     @profile.setter
-    def profile(self, new_profile: Profile) -> None:
+    def profile(
+        self, 
+        new_profile: Profile
+    ) -> None:
         """Modifie le profil de l'utilisateur associé à ce joueur."""
         verify_type(new_profile, Profile, "profile(new_profile)", "new_profile")
 
@@ -59,7 +65,10 @@ class Player:
         return self.__color
 
     @color.setter
-    def color(self, new_color: PieceColor) -> None:
+    def color(
+        self, 
+        new_color: PieceColor
+    ) -> None:
         """Modifie la couleur de ce joueur."""
         verify_type(new_color, PieceColor, "color(new_color)", "new_color")
 
@@ -71,7 +80,10 @@ class Player:
         return self.__board_value
 
     @board_value.setter
-    def board_value(self, new_board_value: int) -> None:
+    def board_value(
+        self, 
+        new_board_value: int
+    ) -> None:
         """Modifie la valeur des pièces que possède ce joueur."""
         verify_type(new_board_value, int, "board_value(new_board_value)", "new_board_value")
 

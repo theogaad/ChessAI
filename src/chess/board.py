@@ -39,7 +39,10 @@ class Board:
         self.__grid: list[list[Case]] = [[Case(Position(i, j)) for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]
 
 
-    def get_reachable_cases_from_position(self, position: Position) -> list[Case]:
+    def get_reachable_cases_from_position(
+        self, 
+        position: Position
+    ) -> list[Case]:
         """Retourne les cases atteignables par la pièce à la position donnée.
         
         Args:
@@ -113,7 +116,10 @@ class Board:
         return piece_reachable_cases
 
 
-    def get_board_value_of_color(self, color: PieceColor):
+    def get_board_value_of_color(
+        self, 
+        color: PieceColor
+    ) -> int:
         """Retourne la valeur de toute les pièce de la couleur donnée.
         
         Raises:
@@ -128,7 +134,10 @@ class Board:
         return value
     
 
-    def apply_move(self, move: Move) -> None:
+    def apply_move(
+        self, 
+        move: Move
+    ) -> None:
         """Modifie l'échiquier pour appliquer le mouvement donné."""
         move.end_case.content = move.start_case.content
         move.start_case.content = None
@@ -136,13 +145,19 @@ class Board:
             move.end_case.content = move.promotion_piece_type(move.moving_piece.piece_color)
 
 
-    def unapply_move(self, move: Move) -> None:
+    def unapply_move(
+        self, 
+        move: Move
+    ) -> None:
         """Modifie l'échiquier pour annuler l'application du mouvement donné."""
         move.start_case.content = move.moving_piece
         move.end_case.content = move.captured_piece
 
 
-    def is_check(self, color: PieceColor) -> bool:
+    def is_check(
+        self, 
+        color: PieceColor
+    ) -> bool:
         """Indique si le roi de la couleur donnée est en échec.
         
         Raises:
@@ -155,7 +170,10 @@ class Board:
         return king_case in self.get_attacked_cases_by_color(get_opposite_color(color))
 
 
-    def get_attacked_cases_by_color(self, color: PieceColor) -> list[Case]:
+    def get_attacked_cases_by_color(
+        self, 
+        color: PieceColor
+    ) -> list[Case]:
         """Détermine toutes les cases qui sont menacées par les pièce de la couleur donnée.
         
         Pour les pions, les cases menacées sont les cases se trouvant dans leurs diagonales.
@@ -184,7 +202,10 @@ class Board:
         return attacked_cases_by_color
 
 
-    def get_reachable_cases_of_color(self, color: PieceColor) -> list[Case]:
+    def get_reachable_cases_of_color(
+        self, 
+        color: PieceColor
+    ) -> list[Case]:
         """Détermine toutes les cases atteignables par les pièces de la couleur donnée.
         
         Args:
@@ -206,7 +227,10 @@ class Board:
         return reachable_cases_of_color
 
 
-    def fill(self, new_configuration: list[list[None | Piece]]) -> None:
+    def fill(
+        self, 
+        new_configuration: list[list[None | Piece]]
+    ) -> None:
         """Modifie le contenu de toutes les cases de l'échiquier selon la configuration donnée.
         
         Args:
@@ -235,7 +259,10 @@ class Board:
                 self.grid[i][j].content = new_configuration[i][j]
 
 
-    def get_piece(self, position: Position) -> Piece:
+    def get_piece(
+        self, 
+        position: Position
+    ) -> Piece:
         """Retourne la pièce située à la position donnée.
         
         Args:
@@ -289,12 +316,18 @@ class Board:
 
 
 
-    def get_case(self, position: Position) -> Case:
+    def get_case(
+        self, 
+        position: Position
+    ) -> Case:
         """Retourne la case de l'échiquier déterminée à partir de la position donnée."""
         return self.grid[position.line][position.column]
 
 
-    def get_case_content(self, position: Position) -> None | Piece:
+    def get_case_content(
+        self, 
+        position: Position
+    ) -> None | Piece:
         """Retourne le contenu de la case de l'échiquier déterminée à partir de la position donnée."""
         return self.get_case(position).content
 
@@ -305,7 +338,10 @@ class Board:
         return self.__grid
 
     @grid.setter
-    def grid(self, new_grid: list[list[Case]]) -> None:
+    def grid(
+        self, 
+        new_grid: list[list[Case]]
+    ) -> None:
         """Modifie la grille de cases.
         
         Args:

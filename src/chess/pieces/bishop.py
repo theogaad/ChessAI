@@ -11,12 +11,18 @@ class Bishop(Piece):
         piece_color: Couleur de la pièce.
         has_moved: Indique si la pièce a déjà été déplacée.
     """
-    def __init__(self, color: PieceColor) -> None:
+    def __init__(
+        self, 
+        color: PieceColor
+    ) -> None:
         """Initialise un fou en utilisant le constructeur de la classe Piece."""
         super().__init__(color)
 
 
-    def get_reachable_positions_from_position(self, position: Position) -> list[Position]:
+    def get_reachable_positions_from_position(
+        self, 
+        position: Position
+    ) -> list[Position]:
         """Détermine les positions atteignables par un fou depuis la position donnée.
 
         Args:

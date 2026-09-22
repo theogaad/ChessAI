@@ -27,7 +27,10 @@ class Case:
         verify_type(self.content, Piece, "Case(position, content=None)", "content", or_none=True)
 
 
-    def contains_a_piece(self, raise_error: bool = False) -> bool:
+    def contains_a_piece(
+        self, 
+        raise_error: bool = False
+    ) -> bool:
         """Indique si le contenu de la case est une pièce et lève une erreur si demandé et si cette case de contient pas de pièce.
         
         Args:
@@ -47,7 +50,10 @@ class Case:
         return f"Case[{self.position}, {self.content}]"
 
 
-    def __eq__(self, value: object) -> bool:
+    def __eq__(
+        self, 
+        value: object
+    ) -> bool:
         """Compare cette case à un objet selon leur position.
         
         La propriété ``content`` n'est pas utilisée dans la comparaison.
@@ -67,7 +73,10 @@ class Case:
         return self.__position
 
     @position.setter
-    def position(self, new_position: Position):
+    def position(
+        self, 
+        new_position: Position
+    ) -> None:
         """Modifie la position de la case.
         
         Args:
@@ -86,7 +95,10 @@ class Case:
         return self.__content
 
     @content.setter
-    def content(self, new_content: None | Piece):
+    def content(
+        self, 
+        new_content: None | Piece
+    ) -> None:
         """Modifie le contenu de la case.
         
         Args:
