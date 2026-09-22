@@ -61,24 +61,24 @@ def verify_type(
         TypeError: Si l'un des paramètre n'est pas du type attendu, ou si ``obj_to_verify`` n'est pas du type ``expected_types``.
     """
     if not isinstance(obj_to_verify, object):
-        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre obj_to_verify doit être du type 'object'.")
+        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument obj_to_verify doit être du type 'object'.")
 
     if not isinstance(expected_types, (type, tuple)):
-        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre expected_types doit être du type 'type' ou 'tuple'.")
+        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument expected_types doit être du type 'type' ou 'tuple'.")
 
     if isinstance(expected_types, tuple):
         for expected_type in expected_types:
             if not isinstance(expected_type, type):
-                raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre expected_types[x] doit être du type 'type'.")
+                raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument expected_types[x] doit être du type 'type'.")
 
     if not isinstance(function_name, str):
-        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre function_name doit être du type 'str'.")
+        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument function_name doit être du type 'str'.")
 
     if not isinstance(variable_name, str):
-        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre variable_name doit être du type 'str'.")
+        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument variable_name doit être du type 'str'.")
 
     if not isinstance(or_none, bool):
-        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) Le paramètre or_none doit être du type 'bool'.")
+        raise TypeError("verify_type(obj_to_verify, expected_types, function_name, variable_name, or_none=False) L'argument or_none doit être du type 'bool'.")
 
     message: str = ""
 
@@ -97,7 +97,7 @@ def verify_type(
         message += f"du type '{expected_types.__name__}'."
         
     if not isinstance(obj_to_verify, expected_types) and not (or_none and obj_to_verify is None):
-        raise TypeError(f"{function_name} Le paramètre {variable_name} doit être {message}")
+        raise TypeError(f"{function_name} L'argument {variable_name} doit être {message}")
 
 
 def get_opposite_color(color: PieceColor):

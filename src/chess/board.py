@@ -301,7 +301,7 @@ class Board:
                 ou si ``color`` n'est pas une instance de ``PieceColor``.
         """
         if any(piece_type not in [Bishop, King, Knight, Pawn, Queen, Rook] for piece_type in piece_types):
-            raise TypeError("get_cases_of_piece_type_and_color(piece_type, color) Le paramètre piece_type doit être un tuple de types parmi 'Bishop', 'King', 'Knight', 'Pawn', 'Queen', 'Rook'.")
+            raise TypeError("get_cases_of_piece_type_and_color(piece_type, color) L'argument' piece_type doit être un tuple de types parmi 'Bishop', 'King', 'Knight', 'Pawn', 'Queen', 'Rook'.")
 
         verify_type(color, PieceColor, "get_cases_of_piece_type_and_color(piece_type, color)", "color")
 

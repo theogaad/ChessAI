@@ -42,7 +42,7 @@ class Move:
         verify_type(self.end_case.content, Piece, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case.content")
 
         if not isinstance(self.start_case.content, Piece):
-            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) Le paramètre start_case.content doit être du type Piece.")
+            raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) L'argument start_case.content doit être du type Piece.")
 
         self.captured_piece: None | Piece = self.end_case.content
         self.moving_piece: Piece = self.start_case.content

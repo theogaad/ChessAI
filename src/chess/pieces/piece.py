@@ -83,7 +83,7 @@ class Piece(ABC):
             verify_type(direction, tuple, "get_reachable_sliding_positions_from_position(position, directions)", "directions[x]")
 
             if len(direction) != 2:
-                raise TypeError("get_reachable_sliding_positions_from_position(position, directions) Le paramètre directions[x] doit être un tuple contenant exactement 2 entiers.")
+                raise TypeError("get_reachable_sliding_positions_from_position(position, directions) L'argument directions[x] doit être un tuple contenant exactement 2 entiers.")
             
             for obj in direction:
                 verify_type(obj, int, "get_reachable_sliding_positions_from_position(position, directions)", "directions[x][x]")
@@ -121,7 +121,7 @@ class Piece(ABC):
             TypeError: Si ``obj`` n'est pas une instance de ``Piece``.
         """
         if not isinstance(obj, Piece):
-            raise TypeError("has_the_same_color(obj) Le paramètre obj doit être du type 'Piece'.")
+            raise TypeError("has_the_same_color(obj) L'argument obj doit être du type 'Piece'.")
 
         return self.piece_color == obj.piece_color
 
