@@ -141,16 +141,6 @@ class Board:
         move.end_case.content = move.captured_piece
 
 
-    def is_check(self) -> None | PieceColor:
-        """Retourne la couleur du roi qui est en échec ou ``None`` si aucun roi n'est en échec."""
-        for color in [WHITE, BLACK]:
-            king_case: Case = self.get_cases_of_piece_type_and_color((King,), color)[0]
-
-            if king_case in self.get_attacked_cases_by_color(get_opposite_color(color)):
-                return color
-
-        return None
-
     def get_attacked_cases_by_color(
         self, 
         color: PieceColor
