@@ -35,12 +35,8 @@ class Board:
         grid: Grille de 8x8 cases.
     """
     def __init__(self) -> None:
-        """Initialise un échiquier avec toutes les cases vides."""
+        """Initialise une grille avec toutes les cases vides puis la remplie avec la congifuration de base d'un échiquier."""
         self.__grid: list[list[Case]] = [[Case(Position(i, j)) for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]
-
-
-    def __post_init__(self) -> None:
-        """Rempli la grille avec la congifuration de base d'un échiquier."""
         self.fill(INITIAL_BOARD)
 
 
@@ -64,7 +60,7 @@ class Board:
         reachable_cases: list[Case] = []
         
         piece: Piece = self.get_piece(position)
-        piece_reachable_cases: list[Case] = [Case(reachable_position) for reachable_position in piece.get_reachable_positions_from_position(position)]
+        piece_reachable_cases: list[Case] = [self.get_case(reachable_position) for reachable_position in piece.get_reachable_positions_from_position(position)]
 
         # Si la pièce est un cavalier ou un roi, il n'y a pas besoin de vérifier les directions.
         if isinstance(piece, (Knight, King)):
@@ -74,51 +70,34 @@ class Board:
 
             return reachable_cases
 
-        # On détermine les différentes directions dans lesquelles la pièce peut aller.
-        directions: list[tuple[int, int]] = []
-        direction: tuple[int, int]
+        forbidden_directions: list[tuple[int, int]] = []
+
         for reachable_case in piece_reachable_cases:
-            direction = position.get_direction(reachable_case.position)
+            direction: tuple[int, int] = position.get_direction(reachable_case.position)
 
-            if not direction in directions:
-                directions.append(direction)
-
-        i: int = 0
-        case: Case = piece_reachable_cases[i]
-
-        # Pour chaque ``direction``, on boucle sur les positions atteignables tant que les positions 
-        # sont dans la même direction que ``direction``.
-        # Ensuite, tant qu'il n'y a aucun obstacle dans la direction ``direction``, on ajoute la cases
-        # aux cases atteignables, sinon on passe à la direction suivante.
-        for direction in directions:
-            case = piece_reachable_cases[i]
-
-            while position.get_direction(case.position) != direction:
-                i += 1
-                case = piece_reachable_cases[i]
-
-            while i < len(piece_reachable_cases) and position.get_direction(case.position) == direction:
+            if direction not in forbidden_directions:
                 if isinstance(piece, Pawn):
-                    # Si le pion se déplace en diagonale et que la case contient une pièce adverse.
-                    if direction[1] != 0 and case.contains_a_piece() and not piece.has_the_same_color(case.content):
-                        reachable_cases.append(case)
+                    if (direction[1] != 0 and 
+                        isinstance(reachable_case.content, Piece) and
+                        not piece.has_the_same_color(reachable_case.content)):
+                        reachable_cases.append(reachable_case)
 
-                    elif direction[1] == 0 and not case.contains_a_piece():
-                        reachable_cases.append(case)
+                    elif direction[1] == 0 and not reachable_case.contains_a_piece():
+                        reachable_cases.append(reachable_case)
 
-                    else:
-                        break
+                    elif direction[1] == 0:
+                        forbidden_directions.append(direction)
 
-                elif not case.contains_a_piece() or not piece.has_the_same_color(case.content):
-                    reachable_cases.append(case)
-                    i += 1
-                    case = piece_reachable_cases[i]
+                elif isinstance(reachable_case.content, Piece):
+                    if not piece.has_the_same_color(reachable_case.content):
+                        reachable_cases.append(reachable_case)
+
+                    forbidden_directions.append(direction)
 
                 else:
-                    break
+                    reachable_cases.append(reachable_case)
 
-
-        return piece_reachable_cases
+        return reachable_cases
 
 
     def get_board_value_of_color(
@@ -146,8 +125,11 @@ class Board:
         """Modifie l'échiquier pour appliquer le mouvement donné."""
         move.end_case.content = move.start_case.content
         move.start_case.content = None
+
         if move.promotion_piece_type:
             move.end_case.content = move.promotion_piece_type(move.moving_piece.piece_color)
+
+        move.moving_piece.has_moved = True
 
 
     def unapply_move(
@@ -159,21 +141,15 @@ class Board:
         move.end_case.content = move.captured_piece
 
 
-    def is_check(
-        self, 
-        color: PieceColor
-    ) -> bool:
-        """Indique si le roi de la couleur donnée est en échec.
-        
-        Raises:
-            TypeError: Si color n'est pas une instance de PieceColor.
-        """
-        verify_type(color, PieceColor, "is_check(color)", "color")
+    def is_check(self) -> None | PieceColor:
+        """Retourne la couleur du roi qui est en échec ou ``None`` si aucun roi n'est en échec."""
+        for color in [WHITE, BLACK]:
+            king_case: Case = self.get_cases_of_piece_type_and_color((King,), color)[0]
 
-        king_case: Case = self.get_cases_of_piece_type_and_color((King,), color)[0]
+            if king_case in self.get_attacked_cases_by_color(get_opposite_color(color)):
+                return color
 
-        return king_case in self.get_attacked_cases_by_color(get_opposite_color(color))
-
+        return None
 
     def get_attacked_cases_by_color(
         self, 
@@ -325,7 +301,6 @@ class Board:
         return list_of_cases
 
 
-
     def get_case(
         self, 
         position: Position
@@ -340,6 +315,21 @@ class Board:
     ) -> None | Piece:
         """Retourne le contenu de la case de l'échiquier déterminée à partir de la position donnée."""
         return self.get_case(position).content
+
+
+    def __eq__(self, value: object) -> bool:
+        """Compare cet échiquier à un autre en comparant chaque case entre elles."""
+        if not isinstance(value, Board):
+            return False
+        
+        is_equal: bool = True
+
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                if self.grid[i][j] != value.grid[i][j]:
+                    is_equal = False
+
+        return is_equal
 
 
     @property

@@ -44,6 +44,20 @@ class Player:
         self.board_value = board.get_board_value_of_color(self.color)
 
 
+    def is_color(
+        self, 
+        color: PieceColor
+    ) -> bool:
+        """Indique si la couleur de ce joueur est la même que la couleur donnée.
+        
+        Raises:
+            TypeError: Si ``color`` n'est pas une instance de ``PieceColor``.
+        """
+        verify_type(color, PieceColor, "is_color(color)", "color")
+
+        return self.color == color
+
+
     @property
     def profile(self) -> Profile:
         """Retourne le profil de l'utilisateur associé à ce joueur."""

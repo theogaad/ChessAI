@@ -15,11 +15,14 @@ class MoveType(Enum):
     PROMOTION = "Promotion"
     EN_PASSANT = "En passant"
 
-class DrawType(Enum):
-    """Représente les différents type de nulles possibles."""
-    STALEMATE = "Stalemate"
-    REPETITION = "Repetition"
-    INSUFFICIENT_MATERIAL = "Insufficient material"
+class GameStatus(Enum):
+    """Représente l'état actuel de la partie."""
+    ONGOING = "Ongoing"
+    CHECKMATE = "Checkmate"
+    DRAW_STALEMATE = "Draw stalemate"
+    DRAW_REPETITION = "Draw repetition"
+    DRAW_INSUFFICIENT_MATERIAL = "Draw insufficient material"
+    DRAW_FIFTY_MOVES = "Draw fifty moves"
 
 
 # Constantes
@@ -111,4 +114,4 @@ def get_opposite_color(color: PieceColor):
     if color == PieceColor.WHITE:
         return PieceColor.BLACK
 
-    return PieceColor.BLACK
+    return PieceColor.WHITE

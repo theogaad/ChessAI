@@ -46,10 +46,11 @@ class Position:
             TypeError: Si ``obj`` n'est pas une instance de ``Position``.
         """
         if not isinstance(obj, Position):
-            raise TypeError("get_direction(obj) Le paramètre obj doit être du type 'Position'.")
+            raise TypeError("get_direction(obj) L'argument obj doit être du type 'Position'.")
 
         # Calcul permettant de ramener les valeurs de la direction à -1, 0 ou 1.
-        return (obj.line > self.line - obj.line < self.line, obj.column > self.column - obj.column < self.column)
+        return (int(obj.line > self.line) - int(obj.line < self.line), 
+                int(obj.column > self.column) - int(obj.column < self.column))
 
 
     def __repr__(self) -> str:

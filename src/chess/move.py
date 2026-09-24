@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from src.chess.case import Case
+from src.chess.exceptions.illegal_move_error import IllegalMoveError
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.knight import Knight
 from src.chess.pieces.piece import Piece
@@ -39,7 +40,6 @@ class Move:
         verify_type(self.end_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case")
         verify_type(self.move_type, MoveType, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "move_type")
         verify_type(self.promotion_piece_type, (Bishop, Knight, Queen, Rook), "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "promotion_piece_type", or_none=True)
-        verify_type(self.end_case.content, Piece, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case.content")
 
         if not isinstance(self.start_case.content, Piece):
             raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) L'argument start_case.content doit être du type Piece.")
@@ -130,6 +130,8 @@ class Move:
         new_promotion_piece_type: None | type[Bishop | Knight | Queen | Rook]
     ) -> None:
         """Modifie le type de la pièce effectuant le mouvement après une éventuelle promotion.
+
+        La modification n'est possible que si le mouvement est déjà typé comme une promotion.
         
         Args:
             new_promotion_piece_type: Nouveau type de la pièce effectuant le mouvement après une éventuelle promotion.
@@ -137,8 +139,11 @@ class Move:
         Raises:
             TypeError: Si new_promotion_piece_type n'est pas du type attendu.
         """
-        verify_type(new_promotion_piece_type, (Bishop, Knight, Queen, Rook), "promotion_piece_type(new_promotion_piece_type)", "new_promotion_piece_type", or_none=True)
+        verify_type(new_promotion_piece_type, (type(Bishop), type(Knight), type(Queen), type(Rook)), "promotion_piece_type(new_promotion_piece_type)", "new_promotion_piece_type", or_none=True)
 
+        if self.move_type != MoveType.PROMOTION:
+            raise IllegalMoveError("promotion_piece_type(new_promotion_piece_type) La propriété ``promotion_piece_type`` ne peut être modifiée que si la propriété ``move_type`` vaut ``MoveType.PROMOTION``.")
+        
         self.__promotion_piece_type = new_promotion_piece_type
 
     @property

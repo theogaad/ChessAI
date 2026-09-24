@@ -31,7 +31,7 @@ class Case:
         self, 
         raise_error: bool = False
     ) -> bool:
-        """Indique si le contenu de la case est une pièce et lève une erreur si demandé et si cette case de contient pas de pièce.
+        """Indique si le contenu de la case est une pièce et lève une erreur si demandé et si cette case ne contient pas de pièce.
         
         Args:
             raise_error: Indique si on doit lever une erreur dans le cas ou cette case ne contient pas de pièce.
@@ -64,7 +64,8 @@ class Case:
         if not isinstance(value, Case):
             return False
         
-        return self.position == value.position
+        return (self.position == value.position and 
+                self.content is value.content)
 
 
     @property
