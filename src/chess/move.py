@@ -3,10 +3,11 @@ from src.chess.case import Case
 from src.chess.exceptions.illegal_move_error import IllegalMoveError
 from src.chess.pieces.bishop import Bishop
 from src.chess.pieces.knight import Knight
+from src.chess.pieces.pawn import Pawn
 from src.chess.pieces.piece import Piece
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
-from src.chess.utils import MoveType, verify_type
+from src.chess.utils import MoveType, BOARD_SIZE, WHITE, BLACK, verify_type
 
 
 
@@ -39,13 +40,22 @@ class Move:
         verify_type(self.start_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "start_case")
         verify_type(self.end_case, Case, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "end_case")
         verify_type(self.move_type, MoveType, "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "move_type")
-        verify_type(self.promotion_piece_type, (Bishop, Knight, Queen, Rook), "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "promotion_piece_type", or_none=True)
+        verify_type(self.promotion_piece_type, (type(Bishop), type(Knight), type(Queen), type(Rook)), "Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None)", "promotion_piece_type", or_none=True)
 
         if not isinstance(self.start_case.content, Piece):
             raise TypeError("Move(start_case, end_case, move_type=MoveType.NORMAL, promotion_piece_type=None) L'argument start_case.content doit être du type Piece.")
 
         self.captured_piece: None | Piece = self.end_case.content
         self.moving_piece: Piece = self.start_case.content
+
+        if isinstance(self.moving_piece, Pawn):
+            if (self.end_case.position.line == BOARD_SIZE - 1 and 
+                self.moving_piece.is_color(WHITE)):
+                self.move_type = MoveType.PROMOTION
+
+            elif (self.end_case.position.line == 0 and
+                  self.moving_piece.is_color(BLACK)):
+                self.move_type = MoveType.PROMOTION
 
 
     def __repr__(self) -> str:

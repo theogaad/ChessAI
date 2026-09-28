@@ -58,6 +58,10 @@ class Player:
         return self.color == color
 
 
+    def __repr__(self):
+        return f"Player {self.color}"
+
+
     @property
     def profile(self) -> Profile:
         """Retourne le profil de l'utilisateur associé à ce joueur."""

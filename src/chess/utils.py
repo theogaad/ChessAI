@@ -38,9 +38,18 @@ KNIGHT_VALUE: int = 3
 ROOK_VALUE: int = 5
 QUEEN_VALUE: int = 13
 
+# Valeurs des coups
+PROMOTION_VALUE: int = 3
+CAPTURE_VALUE: int = 2
+NORMAL_VALUE: int = 1
+
 # Couleurs
 WHITE = PieceColor.WHITE
 BLACK = PieceColor.BLACK
+
+INF = 1000 # Représente l'infini
+CHECKMATE = 999 # Valeur d'un échec et mat
+DRAW = 0 # Valeur d'une nulle
 
 
 # Fonctions

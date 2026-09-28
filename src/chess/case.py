@@ -65,7 +65,7 @@ class Case:
             return False
         
         return (self.position == value.position and 
-                self.content is value.content)
+                self.content == value.content)
 
 
     @property

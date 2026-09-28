@@ -74,13 +74,12 @@ class Game:
 
         for reachable_case in self.board.get_reachable_cases_from_position(position):
             test_move: Move = Move(self.board.get_case(position), reachable_case)
-            self.board.apply_move(test_move)
+            ancient_has_move: bool = self.board.apply_move(test_move)
 
             if not self.is_check(piece.piece_color):
                 legally_reachable_cases.append(reachable_case)
 
-            self.board.unapply_move(test_move)
-            self.update_has_moved(test_move.moving_piece)
+            self.board.unapply_move(test_move, ancient_has_move)
 
         legally_reachable_cases.extend(self.get_legally_reachable_cases_by_castling_from_position(position))
         legally_reachable_cases.extend(self.get_legally_reachable_cases_by_en_passant_from_position(position))
@@ -169,13 +168,12 @@ class Game:
                             actual_case.position.column + direction
                         ))
                         test_move: Move = Move(actual_case, reachable_case)
-                        self.board.apply_move(test_move)
+                        ancient_has_move: bool = self.board.apply_move(test_move)
 
                         if not self.is_check(piece.piece_color):
                             legally_reachable_cases_by_en_passant.append(reachable_case)
 
-                        self.board.unapply_move(test_move)
-                        self.update_has_moved(test_move.moving_piece)
+                        self.board.unapply_move(test_move, ancient_has_move)
         
         return legally_reachable_cases_by_en_passant
 
@@ -229,13 +227,12 @@ class Game:
                 for position in case.content.get_reachable_positions_from_position(case.position):
                     if case.position.get_direction(position)[1] != 0:
                         test_move: Move = Move(case, self.board.get_case(position))
-                        self.board.apply_move(test_move)
+                        ancient_has_move: bool = self.board.apply_move(test_move)
                         
                         if self.is_check(color):
                             legally_attacked_cases.append(self.board.get_case(position))
 
-                        self.board.unapply_move(test_move)
-                        self.update_has_moved(test_move.moving_piece)
+                        self.board.unapply_move(test_move, ancient_has_move)
 
             else:
                 legally_attacked_cases.extend(self.get_legally_reachable_cases_from_position(case.position))
@@ -284,11 +281,14 @@ class Game:
     def apply_move(
         self, 
         move: Move
-    ) -> None:
+    ) -> bool:
         """Applique le mouvement donné à cette partie.
         
         Args:
             move: Mouvement à appliquer.
+
+        Returns:
+            Un booléen indiquant l'ancienne valeur de la propriété ``has_moved``.
         
         Raises:
             TypeError: Si ``move`` n'est pas une instance de ``Move``.
@@ -300,18 +300,21 @@ class Game:
 
         if not move.moving_piece.is_color(self.current_player.color):
             raise IllegalMoveError("apply_move(move) La couleur de la pièce contenue dans ``move.start_case`` doit être la même que celle du joueur actuel.")
-
+        
         self.update_move_type_and_properties(move)
-        self.board.apply_move(move)
+        ancient_has_moved: bool = self.board.apply_move(move)
         self.move_history.append(move)
         self.game_info_history.append(self.get_game_info())
         self.update_game_status_and_end_the_game()
         self.switch_current_player()
 
+        return ancient_has_moved
+
 
     def unapply_move(
         self, 
-        move: Move
+        move: Move,
+        ancient_has_move: bool
     ) -> None:
         """Annule le mouvement donné sur cette partie.
                 
@@ -328,7 +331,7 @@ class Game:
         if not move in self.move_history:
             raise ChessError("Ce mouvement n'est pas présent dans l'historique des mouvements.")
 
-        self.board.unapply_move(move)
+        self.board.unapply_move(move, ancient_has_move)
         # On supprime la dernière occurence du mouvement dans l'historique.
         self.move_history.reverse()
         self.move_history.remove(move)
@@ -337,32 +340,6 @@ class Game:
 
         if not move.moving_piece.is_color(self.current_player.color):
             self.switch_current_player()
-
-
-    def update_has_moved(self, piece: Piece) -> None:
-        """Actualise la propriété ``has_moved`` de la pièce en s'appuyant sur l'historique des mouvements.
-        
-        Args:
-            piece: Pièce dont on actualise la propriété ``has_moved``.
-        
-        Raises:
-            TypeError: Si ``piece`` n'est pas une instance de ``Piece``.
-        """
-        verify_type(piece, Piece, "update_has_moved(piece)", "piece")
-
-        piece_has_moved: bool = False
-
-        for ancient_move in self.move_history:
-            if ancient_move.moving_piece is piece:
-                piece_has_moved = True
-            
-        piece.has_moved = piece_has_moved
-
-    
-    def unapply_last_move(self) -> None:
-        """Annule le dernier coup enregistré dans l'historique de cette partie."""
-        # TODO: Possiblement supprimer.
-        self.unapply_move(self.move_history[-1])
 
 
     def update_move_type_and_properties(
@@ -388,7 +365,8 @@ class Game:
 
         elif self.is_promotion(move):
             move.move_type = MoveType.PROMOTION
-            move.promotion_piece_type = self.ask_for_promotion_piece_type()
+            if not move.promotion_piece_type:
+                move.promotion_piece_type = self.ask_for_promotion_piece_type()
 
         else:
             move.move_type = MoveType.NORMAL

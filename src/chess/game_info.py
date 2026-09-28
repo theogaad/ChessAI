@@ -6,7 +6,7 @@ from src.chess.utils import verify_type
 
 
 
-@dataclass(frozen=True)
+@dataclass
 class GameInfo:
     """Contient les informations essentielles de l'état d'une partie à un moment précis.
     

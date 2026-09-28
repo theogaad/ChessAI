@@ -9,7 +9,7 @@ from src.chess.pieces.piece import Piece
 from src.chess.pieces.queen import Queen
 from src.chess.pieces.rook import Rook
 from src.chess.position import Position
-from src.chess.utils import BOARD_SIZE, WHITE, BLACK, PieceColor, verify_type, get_opposite_color
+from src.chess.utils import BOARD_SIZE, WHITE, BLACK, PieceColor, MoveType, verify_type, get_opposite_color
 
 
 
@@ -121,24 +121,61 @@ class Board:
     def apply_move(
         self, 
         move: Move
-    ) -> None:
-        """Modifie l'échiquier pour appliquer le mouvement donné."""
+    ) -> bool:
+        """Modifie l'échiquier pour appliquer le mouvement donné.
+        
+        Returns:
+            Un booléen indiquant l'ancienne valeur de la propriété ``has_moved``.
+        """
         move.end_case.content = move.start_case.content
         move.start_case.content = None
 
         if move.promotion_piece_type:
             move.end_case.content = move.promotion_piece_type(move.moving_piece.piece_color)
 
+        elif move.move_type == MoveType.CASTLING:
+            rook_column: int = 0 if move.end_case.position.column < move.start_case.position.column else BOARD_SIZE - 1
+            rook_case: Case = self.get_case(Position(move.start_case.position.line, rook_column))
+            rook_end_case_column: int = 3 if move.end_case.position.column < move.start_case.position.column else BOARD_SIZE - 3
+
+            self.get_piece(rook_case.position).has_moved = True
+            self.get_case(Position(move.start_case.position.line, rook_end_case_column)).content = rook_case.content
+            rook_case.content = None
+
+        elif move.move_type == MoveType.EN_PASSANT:
+            self.get_case(Position(move.start_case.position.line, move.end_case.position.column)).content = None
+
+        ancient_has_moved: bool = move.moving_piece.has_moved
         move.moving_piece.has_moved = True
+        return ancient_has_moved
 
 
     def unapply_move(
         self, 
-        move: Move
+        move: Move, 
+        ancient_has_moved: bool
     ) -> None:
-        """Modifie l'échiquier pour annuler l'application du mouvement donné."""
+        """Modifie l'échiquier pour annuler l'application du mouvement donné.
+        
+        Args:
+            move: Mouvement à annuler.
+            ancient_has_moved: Ancienne valeur de la propriété has_moved de la pièce effectuant le mouvement.
+        """
+        if move.move_type == MoveType.CASTLING:
+            rook_column: int = 3 if move.end_case.position.column < move.start_case.position.column else BOARD_SIZE - 3
+            rook_case: Case = self.get_case(Position(move.start_case.position.line, rook_column))
+            rook_end_case_column: int = 0 if move.end_case.position.column < move.start_case.position.column else BOARD_SIZE - 1
+
+            self.get_piece(rook_case.position).has_moved = False
+            self.get_case(Position(move.start_case.position.line, rook_end_case_column)).content = rook_case.content
+            rook_case.content = None
+
+        elif move.move_type == MoveType.EN_PASSANT:
+            self.get_case(Position(move.start_case.position.line, move.end_case.position.column)).content = move.captured_piece
+
         move.start_case.content = move.moving_piece
         move.end_case.content = move.captured_piece
+        move.moving_piece.has_moved = ancient_has_moved
 
 
     def get_attacked_cases_by_color(
