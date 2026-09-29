@@ -24,7 +24,7 @@ class MoveType(Enum):
     EN_PASSANT = "en passant"
 
 class GameStatus(Enum):
-    """Représente le status d'une partie d'échecs."""
+    """Représente le statut d'une partie d'échecs."""
 
     ONGOING = "ongoing"
     CHECKMATE = "checkmate"
