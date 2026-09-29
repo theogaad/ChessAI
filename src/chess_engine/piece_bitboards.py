@@ -31,6 +31,13 @@ class PieceBitboards:
     respectées par l'appelant. Aucune vérification de cohérence n'est
     effectuée par cette classe afin de limiter le coût des opérations
     fréquentes utilisées notamment lors de la recherche de coups.
+
+    Attributes:
+        _bitboards: Bitboards des douze combinaisons de couleur et de type
+            de pièce.
+        _white_pieces: Bitboard contenant toutes les pièces blanches.
+        _black_pieces: Bitboard contenant toutes les pièces noires.
+        _occupied: Bitboard contenant toutes les pièces.
     """
 
     def __init__(self, bitboards: Bitboards) -> None:
