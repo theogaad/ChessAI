@@ -20,7 +20,10 @@ class Position:
             capture en passant, ou None si aucune capture en passant n'est
             disponible.
         halfmove_clock: Nombre de demi-coups écoulés depuis le dernier
-            déplacement de pion ou la dernière capture.
+            déplacement de pion ou de la dernière capture.
+        fullmove_number: Numéro du coup complet dans la partie. Commence à 1
+            et est incrémenté après chaque coup des Noirs.
+
     """
 
     def __init__(self, fen: str) -> None:
