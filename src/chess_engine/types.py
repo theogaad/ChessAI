@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntFlag
 
 class Color(Enum):
     """Représente les couleurs des pièces d'échec."""
@@ -13,7 +13,7 @@ class Color(Enum):
         Returns:
             La couleur opposée à celle de l'instance.
         """
-        
+
         return Color.BLACK if self is Color.WHITE else Color.WHITE
 
 class PieceType(Enum):
@@ -47,3 +47,12 @@ class DrawReason(Enum):
     REPETITION = "repetition"
     FIFTY_MOVES = "fifty moves"
     INSUFFICIENT_MATERIAL = "insufficient_material"
+
+class CastlingRights(IntFlag):
+    """Représente les droits de roque disponibles."""
+
+    NONE = 0
+    WHITE_KINGSIDE = 1 << 0
+    WHITE_QUEENSIDE = 1 << 1
+    BLACK_KINGSIDE = 1 << 2
+    BLACK_QUEENSIDE = 1 << 3
