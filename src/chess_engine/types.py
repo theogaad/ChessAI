@@ -6,6 +6,16 @@ class Color(Enum):
     WHITE = 0
     BLACK = 1
 
+    @property
+    def opposite(self) -> "Color":
+        """Retourne la couleur opposée.
+
+        Returns:
+            La couleur opposée à celle de l'instance.
+        """
+        
+        return Color.BLACK if self is Color.WHITE else Color.WHITE
+
 class PieceType(Enum):
     """Représente les types des pièces d'échec."""
 
