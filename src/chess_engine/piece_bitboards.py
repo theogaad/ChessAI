@@ -122,8 +122,12 @@ class PieceBitboards:
         bitboard_index: int = color.value * 6 + piece_type.value
         self._bitboards[bitboard_index] |= square_mask
 
-        self._white_pieces |= square_mask
-        self._black_pieces |= square_mask
+        if color is Color.WHITE:
+            self._white_pieces |= square_mask
+
+        else:
+            self._black_pieces |= square_mask
+        
         self._occupied |= square_mask
 
     def remove_piece(
@@ -147,8 +151,12 @@ class PieceBitboards:
         bitboard_index: int = color.value * 6 + piece_type.value
         self._bitboards[bitboard_index] &= ~square_mask
 
-        self._white_pieces &= ~square_mask
-        self._black_pieces &= ~square_mask
+        if color is Color.WHITE:
+            self._white_pieces &= ~square_mask
+
+        else:
+            self._black_pieces &= ~square_mask
+
         self._occupied &= ~square_mask
 
     def move_piece(
@@ -175,10 +183,11 @@ class PieceBitboards:
     def clear(self) -> None:
         """Retire toutes les pièces des bitboards."""
         for i in range(12):
-            self._bitboards[i] = 0x0000000000000000
-        self._white_pieces = 0x0000000000000000
-        self._black_pieces = 0x0000000000000000
-        self._occupied = 0x0000000000000000
+            self._bitboards[i] = 0
+
+        self._white_pieces = 0
+        self._black_pieces = 0
+        self._occupied = 0
 
     def get_piece_at(
         self,
