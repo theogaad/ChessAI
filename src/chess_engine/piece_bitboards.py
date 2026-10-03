@@ -1,11 +1,6 @@
 from src.chess_engine.types import Color, PieceType
 from typing import TypeAlias
 
-Bitboards: TypeAlias = list[
-    int, int, int, int, int, int,
-    int, int, int, int, int, int
-]
-
 TupleBitboards: TypeAlias = tuple[
     int, int, int, int, int, int,
     int, int, int, int, int, int
@@ -45,7 +40,7 @@ class PieceBitboards:
         _occupied: Bitboard contenant toutes les pièces.
     """
 
-    def __init__(self, bitboards: Bitboards) -> None:
+    def __init__(self, bitboards: TupleBitboards) -> None:
         """Initialise la représentation des pièces à partir de bitboards.
 
         Les bitboards sont fournis dans l'ordre correspondant aux combinaisons
@@ -54,7 +49,7 @@ class PieceBitboards:
         Args:
             bitboards: Tuple contenant les douze bitboards des pièces.
         """
-        self._bitboards: Bitboards = bitboards
+        self._bitboards: list[int] = list(bitboards)
         self._white_pieces: int = bitboards[0] | bitboards[1] | bitboards[2] | bitboards[3] | bitboards[4] | bitboards[5]
         self._black_pieces: int = bitboards[6] | bitboards[7] | bitboards[8] | bitboards[9] | bitboards[10] | bitboards[11]
         self._occupied: int = self._white_pieces | self._black_pieces
@@ -127,9 +122,9 @@ class PieceBitboards:
         bitboard_index: int = color.value * 6 + piece_type.value
         self._bitboards[bitboard_index] |= square_mask
 
-        self._white_pieces: int = self._bitboards[0] | self._bitboards[1] | self._bitboards[2] | self._bitboards[3] | self._bitboards[4] | self._bitboards[5]
-        self._black_pieces: int = self._bitboards[6] | self._bitboards[7] | self._bitboards[8] | self._bitboards[9] | self._bitboards[10] | self._bitboards[11]
-        self._occupied: int = self._white_pieces | self._black_pieces
+        self._white_pieces |= square_mask
+        self._black_pieces |= square_mask
+        self._occupied |= square_mask
 
     def remove_piece(
         self,
@@ -152,9 +147,9 @@ class PieceBitboards:
         bitboard_index: int = color.value * 6 + piece_type.value
         self._bitboards[bitboard_index] &= ~square_mask
 
-        self._white_pieces: int = self._bitboards[0] | self._bitboards[1] | self._bitboards[2] | self._bitboards[3] | self._bitboards[4] | self._bitboards[5]
-        self._black_pieces: int = self._bitboards[6] | self._bitboards[7] | self._bitboards[8] | self._bitboards[9] | self._bitboards[10] | self._bitboards[11]
-        self._occupied: int = self._white_pieces | self._black_pieces
+        self._white_pieces &= ~square_mask
+        self._black_pieces &= ~square_mask
+        self._occupied &= ~square_mask
 
     def move_piece(
         self,
