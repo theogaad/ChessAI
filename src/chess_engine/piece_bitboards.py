@@ -49,7 +49,10 @@ class PieceBitboards:
         Args:
             bitboards: Tuple contenant les douze bitboards des pièces.
         """
-        # TODO
+        self._bitboards: Bitboards = bitboards
+        self._white_pieces: int = bitboards[0] | bitboards[1] | bitboards[2] | bitboards[3] | bitboards[4] | bitboards[5]
+        self._black_pieces: int = bitboards[6] | bitboards[7] | bitboards[8] | bitboards[9] | bitboards[10] | bitboards[11]
+        self._occupied: int = self._white_pieces | self._black_pieces
 
     @property
     def bitboards(self) -> Bitboards:
@@ -58,7 +61,7 @@ class PieceBitboards:
         Returns:
             Un tuple contenant les douze bitboards.
         """
-        # TODO
+        return self._bitboards
 
     @property
     def white_pieces(self) -> int:
@@ -67,7 +70,7 @@ class PieceBitboards:
         Returns:
             Le bitboard d'occupation des pièces blanches.
         """
-        # TODO
+        return self._white_pieces
 
     @property
     def black_pieces(self) -> int:
@@ -76,7 +79,7 @@ class PieceBitboards:
         Returns:
             Le bitboard d'occupation des pièces noires.
         """
-        # TODO
+        return self._black_pieces
 
     @property
     def occupied(self) -> int:
@@ -85,7 +88,7 @@ class PieceBitboards:
         Returns:
             Le bitboard d'occupation de l'ensemble des pièces.
         """
-        # TODO
+        return self._occupied
 
     def add_piece(
         self,
