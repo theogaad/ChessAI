@@ -1,5 +1,5 @@
 from src.chess_engine.position import Position
-from src.chess_engine.types import Color, PieceType
+from src.chess_engine.types import Color, PieceType, CastlingRights
 
 
 class Zobrist:
@@ -72,7 +72,7 @@ class Zobrist:
         """
         # TODO
 
-    def castling_key(self, castling_rights: int) -> int:
+    def castling_key(self, castling_rights: CastlingRights) -> int:
         """Retourne la clé Zobrist associée aux droits de roque.
 
         Args:
