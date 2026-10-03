@@ -107,7 +107,7 @@ class PieceBitboards:
             square: Indice de la case où ajouter la pièce.
 
         """
-        # TODO
+        self.get_bitboard(color, piece_type) |= square
 
     def remove_piece(
         self,
@@ -126,7 +126,7 @@ class PieceBitboards:
             square: Indice de la case sur laquelle retirer la pièce.
 
         """
-        # TODO
+        self.get_bitboard(color, piece_type) &= ~square
 
     def move_piece(
         self,
@@ -146,7 +146,8 @@ class PieceBitboards:
             start_square: Indice de la case de départ.
             end_square: Indice de la case d'arrivée.
         """
-        # TODO
+        self.remove_piece(color, piece_type, start_square)
+        self.add_piece(color, piece_type, end_square)
 
     def clear(self) -> None:
         """Retire toutes les pièces des bitboards."""
@@ -166,7 +167,12 @@ class PieceBitboards:
             Un tuple contenant la couleur et le type de la pièce présente,
             ou None si la case est vide.
         """
-        # TODO
+        for color in Color:
+            for piece_type in PieceType:
+                if square & self.get_bitboard(color, piece_type):
+                    return (color, piece_type)
+
+        return None
 
     def get_bitboard(
         self,
