@@ -176,6 +176,9 @@ class PieceBitboards:
         """Retire toutes les pièces des bitboards."""
         for i in range(12):
             self._bitboards[i] = 0x0000000000000000
+        self._white_pieces = 0x0000000000000000
+        self._black_pieces = 0x0000000000000000
+        self._occupied = 0x0000000000000000
 
     def get_piece_at(
         self,
