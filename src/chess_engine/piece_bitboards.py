@@ -1,7 +1,12 @@
 from src.chess_engine.types import Color, PieceType
 from typing import TypeAlias
 
-Bitboards: TypeAlias = tuple[
+Bitboards: TypeAlias = list[
+    int, int, int, int, int, int,
+    int, int, int, int, int, int
+]
+
+TupleBitboards: TypeAlias = tuple[
     int, int, int, int, int, int,
     int, int, int, int, int, int
 ]
@@ -55,13 +60,24 @@ class PieceBitboards:
         self._occupied: int = self._white_pieces | self._black_pieces
 
     @property
-    def bitboards(self) -> Bitboards:
+    def bitboards(self) -> TupleBitboards:
         """Retourne les bitboards des douze combinaisons de pièces.
 
         Returns:
             Un tuple contenant les douze bitboards.
         """
-        return self._bitboards
+        return (self._bitboards[0], 
+                self._bitboards[1], 
+                self._bitboards[2], 
+                self._bitboards[3], 
+                self._bitboards[4], 
+                self._bitboards[5], 
+                self._bitboards[6], 
+                self._bitboards[7], 
+                self._bitboards[8], 
+                self._bitboards[9], 
+                self._bitboards[10], 
+                self._bitboards[11])
 
     @property
     def white_pieces(self) -> int:
@@ -107,7 +123,13 @@ class PieceBitboards:
             square: Indice de la case où ajouter la pièce.
 
         """
-        self.get_bitboard(color, piece_type) |= square
+        square_mask: int = 1 << square
+        bitboard_index: int = color.value * 6 + piece_type.value
+        self._bitboards[bitboard_index] |= square_mask
+
+        self._white_pieces: int = self._bitboards[0] | self._bitboards[1] | self._bitboards[2] | self._bitboards[3] | self._bitboards[4] | self._bitboards[5]
+        self._black_pieces: int = self._bitboards[6] | self._bitboards[7] | self._bitboards[8] | self._bitboards[9] | self._bitboards[10] | self._bitboards[11]
+        self._occupied: int = self._white_pieces | self._black_pieces
 
     def remove_piece(
         self,
@@ -126,7 +148,13 @@ class PieceBitboards:
             square: Indice de la case sur laquelle retirer la pièce.
 
         """
-        self.get_bitboard(color, piece_type) &= ~square
+        square_mask: int = 1 << square
+        bitboard_index: int = color.value * 6 + piece_type.value
+        self._bitboards[bitboard_index] &= ~square_mask
+
+        self._white_pieces: int = self._bitboards[0] | self._bitboards[1] | self._bitboards[2] | self._bitboards[3] | self._bitboards[4] | self._bitboards[5]
+        self._black_pieces: int = self._bitboards[6] | self._bitboards[7] | self._bitboards[8] | self._bitboards[9] | self._bitboards[10] | self._bitboards[11]
+        self._occupied: int = self._white_pieces | self._black_pieces
 
     def move_piece(
         self,
@@ -167,9 +195,10 @@ class PieceBitboards:
             Un tuple contenant la couleur et le type de la pièce présente,
             ou None si la case est vide.
         """
+        square_mask: int = 1 << square
         for color in Color:
             for piece_type in PieceType:
-                if square & self.get_bitboard(color, piece_type):
+                if square_mask & self.get_bitboard(color, piece_type):
                     return (color, piece_type)
 
         return None
