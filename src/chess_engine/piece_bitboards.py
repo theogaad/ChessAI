@@ -150,7 +150,8 @@ class PieceBitboards:
 
     def clear(self) -> None:
         """Retire toutes les pièces des bitboards."""
-        # TODO
+        for i in range(12):
+            self._bitboards[i] = 0x0000000000000000
 
     def get_piece_at(
         self,
@@ -182,4 +183,5 @@ class PieceBitboards:
             Le bitboard correspondant à la combinaison de couleur et de
             type de pièce demandée.
         """
-        # TODO
+        bitboard_index: int = color.value * 6 + piece_type.value
+        return self._bitboards[bitboard_index]
