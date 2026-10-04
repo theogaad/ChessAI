@@ -4,12 +4,18 @@ from dataclasses import dataclass
 import re
 from typing import TYPE_CHECKING
 
-from src.chess_engine.constants import BOARD_SIZE, ASCII_VALUE
+from src.chess_engine.constants import BOARD_SIZE, PIECE_TYPE_NUMBER, ASCII_VALUE
 from src.chess_engine.types import Color, PieceType, CastlingRights
 from src.chess_engine.piece_bitboards import PieceBitboards
 
 if TYPE_CHECKING:
     from src.chess_engine.position import Position
+
+
+PIECE_TO_FEN: tuple[str] = (
+    'K', 'Q', 'R', 'B', 'N', 'P', 
+    'k', 'q', 'r', 'b', 'n', 'p'
+)
 
 
 @dataclass
@@ -82,17 +88,6 @@ def parse_fen(fen: str) -> FENData:
                                 fullmove_number_info)
 
     return fen_data
-
-def to_fen(position: Position) -> str:
-    """Convertit une position en chaîne FEN.
-
-    Args:
-        position: Position à convertir au format FEN.
-
-    Returns:
-        Une chaîne représentant la position au format FEN.
-    """
-    # TODO
 
 def fen_to_bitboards(string: str) -> PieceBitboards:
     """Convertit la partie positionnelle d'une FEN en bitboards.
@@ -267,3 +262,83 @@ def fen_to_en_passant_square(string: str) -> int | None:
 
     else:
         raise ValueError(f"fen_to_en_passant_square(string) : '{string}' n'est pas une chaîne valide.")
+
+def to_fen(position: Position) -> str:
+    """Convertit une position en chaîne FEN.
+
+    Args:
+        position: Position à convertir au format FEN.
+
+    Returns:
+        Une chaîne représentant la position au format FEN.
+    """
+    bitboards_info: str = bitboards_to_fen(position.piece_bitboards)
+    side_to_move_info: str = color_to_fen(position.side_to_move)
+    castling_rights_info: str = castling_rights_to_fen(position.castling_rights)
+    en_passant_square_info: str = en_passant_square_to_fen(position.en_passant_square)
+    halfmove_clock_info: str = str(position.halfmove_clock)
+    fullmove_number_info: str = str(position.fullmove_number)
+
+    return f"{bitboards_info} {side_to_move_info} {castling_rights_info} {en_passant_square_info} {halfmove_clock_info} {fullmove_number_info}"
+
+def bitboards_to_fen(piece_bitboards: PieceBitboards) -> str:
+    fen_bitboards: str = ""
+
+    for rank_index in range(BOARD_SIZE):
+        empty_square_counter: int = 0
+
+        for file_index in range(BOARD_SIZE):
+            square: int = rank_index * BOARD_SIZE + (BOARD_SIZE - file_index - 1)
+            piece: tuple[Color, PieceType] | None = piece_bitboards.get_piece_at(square)
+
+            if piece:
+                if empty_square_counter != 0:
+                    fen_bitboards += str(empty_square_counter)
+                    empty_square_counter = 0
+
+                color, piece_type = piece
+                fen_bitboards += PIECE_TO_FEN[color.value * PIECE_TYPE_NUMBER + piece_type.value]
+
+            else:
+                empty_square_counter += 1
+
+        if empty_square_counter != 0:
+            fen_bitboards += str(empty_square_counter)
+
+        if rank_index != BOARD_SIZE - 1:
+            fen_bitboards += '/'
+
+    return fen_bitboards
+
+def color_to_fen(color: Color) -> str:
+    if color is Color.WHITE:
+        return 'w'
+
+    return 'b'
+
+def castling_rights_to_fen(castling_rights: CastlingRights) -> str:
+    if castling_rights is CastlingRights.NONE:
+        return '-'
+
+    else:
+        fen_castling_rights: str = ""
+
+        if castling_rights & CastlingRights.WHITE_KINGSIDE:
+            fen_castling_rights += "K"
+        if castling_rights & CastlingRights.WHITE_QUEENSIDE:
+            fen_castling_rights += "Q"
+        if castling_rights & CastlingRights.BLACK_KINGSIDE:
+            fen_castling_rights += "k"
+        if castling_rights & CastlingRights.BLACK_QUEENSIDE:
+            fen_castling_rights += "q"
+
+        return fen_castling_rights
+
+def en_passant_square_to_fen(en_passant_square: int | None) -> str:
+    if en_passant_square is None:
+        return '-'
+
+    file: str = chr(ASCII_VALUE + BOARD_SIZE - 1 - en_passant_square % BOARD_SIZE)
+    rank: str = str(BOARD_SIZE - en_passant_square // BOARD_SIZE)
+
+    return file + rank
