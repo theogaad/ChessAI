@@ -171,29 +171,29 @@ def test_fen_to_bitboards_invalid(string) -> None:
 def test_parse_fen_initial_position() -> None:
     fen_data: FENData = parse_fen(INITIAL_FEN)
 
-    assert fen_data.side_to_move is Color.WHITE
+    assert fen_data.side_to_move is Color.WHITE, "La valeur de l'attribut 'side_to_move' n'est pas celle attendue."
     assert fen_data.castling_rights == (
         CastlingRights.WHITE_KINGSIDE
         | CastlingRights.WHITE_QUEENSIDE
         | CastlingRights.BLACK_KINGSIDE
         | CastlingRights.BLACK_QUEENSIDE
-    )
-    assert fen_data.en_passant_square is None
-    assert fen_data.halfmove_clock == 0
-    assert fen_data.fullmove_number == 1
+    ), "La valeur de l'attribut 'castling_rights' n'est pas celle attendue."
+    assert fen_data.en_passant_square is None, "La valeur de l'attribut 'en_passant_square' n'est pas celle attendue."
+    assert fen_data.halfmove_clock == 0, "La valeur de l'attribut 'halfmove_clock' n'est pas celle attendue."
+    assert fen_data.fullmove_number == 1, "La valeur de l'attribut 'fullmove_number' n'est pas celle attendue."
 
 def test_parse_fen() -> None:
     fen_data: FENData = parse_fen(
         "r3k2r/8/8/3pP3/8/8/8/R3K2R b Kq e6 17 42"
     )
 
-    assert fen_data.side_to_move is Color.BLACK
+    assert fen_data.side_to_move is Color.BLACK, "La valeur de l'attribut 'side_to_move' n'est pas celle attendue."
     assert fen_data.castling_rights == (
         CastlingRights.WHITE_KINGSIDE | CastlingRights.BLACK_QUEENSIDE
-    )
-    assert fen_data.en_passant_square == 19
-    assert fen_data.halfmove_clock == 17
-    assert fen_data.fullmove_number == 42
+    ), "La valeur de l'attribut 'castling_rights' n'est pas celle attendue."
+    assert fen_data.en_passant_square == 19, "La valeur de l'attribut 'en_passant_square' n'est pas celle attendue."
+    assert fen_data.halfmove_clock == 17, "La valeur de l'attribut 'halfmove_clock' n'est pas celle attendue."
+    assert fen_data.fullmove_number == 42, "La valeur de l'attribut 'fullmove_number' n'est pas celle attendue."
 
 @pytest.mark.parametrize("string", [
     "",

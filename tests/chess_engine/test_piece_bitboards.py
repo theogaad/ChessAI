@@ -145,7 +145,9 @@ def assert_invariant_consistency(piece_bitboards: PieceBitboards) -> None:
         white_pieces |= piece_bitboards.get_bitboard(Color.WHITE, piece_type)
         black_pieces |= piece_bitboards.get_bitboard(Color.BLACK, piece_type)
 
-    assert piece_bitboards.white_pieces == white_pieces
-    assert piece_bitboards.black_pieces == black_pieces
-    assert piece_bitboards.white_pieces & piece_bitboards.black_pieces == 0
-    assert piece_bitboards.occupied == piece_bitboards.white_pieces | piece_bitboards.black_pieces
+    assert piece_bitboards.white_pieces == white_pieces, "Le bitboard white_pieces ne possède pas la valeur attendue."
+    assert piece_bitboards.black_pieces == black_pieces, "Le bitboard black_pieces ne possède pas la valeur attendue."
+    assert (piece_bitboards.white_pieces & 
+            piece_bitboards.black_pieces) == 0, "Les bitboards white_pieces et black_pieces ont des pièces en commun."
+    assert piece_bitboards.occupied == (piece_bitboards.white_pieces | 
+                                        piece_bitboards.black_pieces), "Le bitboard occupied ne possède pas la valeur attendue."
