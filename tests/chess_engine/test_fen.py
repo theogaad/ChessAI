@@ -1,8 +1,19 @@
 import pytest
 
 from src.chess_engine.constants import INITIAL_FEN
-from src.chess_engine.fen import FENData, parse_fen, fen_to_bitboards, fen_to_piece, fen_to_color, fen_to_castling_rights, fen_to_en_passant_square
+from src.chess_engine.fen import (
+    FENData, 
+    parse_fen, 
+    fen_to_bitboards, 
+    fen_to_piece, 
+    fen_to_color, 
+    fen_to_castling_rights, 
+    fen_to_en_passant_square, 
+    to_fen,
+    bitboards_to_fen
+)
 from src.chess_engine.piece_bitboards import PieceBitboards
+from src.chess_engine.position import Position
 from src.chess_engine.types import Color, PieceType, CastlingRights
 
 
@@ -210,3 +221,129 @@ def test_parse_fen() -> None:
 def test_parse_fen_invalid(string) -> None:
     with pytest.raises(ValueError):
         parse_fen(string)
+
+@pytest.mark.parametrize(
+    "fen",
+    [
+        # Position initiale
+        INITIAL_FEN,
+
+        # Plateau presque vide
+        "8/8/8/8/8/8/8/4K2k w - - 0 1",
+
+        # Toutes les pièces blanches
+        "8/8/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
+
+        # Toutes les pièces noires
+        "rnbqkbnr/pppppppp/8/8/8/8/8/8 b - - 0 1",
+
+        # Toutes les pièces sur un même rang
+        "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w - - 15 42",
+
+        # Position avec des cases vides au milieu des pièces
+        "r3k2r/8/2q5/8/3P4/8/2Q5/R3K2R w KQkq - 7 23",
+
+        # Droits de roque blancs uniquement
+        "4k3/8/8/8/8/8/8/4K3 w KQ - 0 1",
+
+        # Droits de roque noirs uniquement
+        "4k3/8/8/8/8/8/8/4K3 b kq - 0 1",
+
+        # Aucun droit de roque
+        "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+
+        # En passant blanc
+        "4k3/8/8/8/3pP3/8/8/4K3 w - d6 0 1",
+
+        # En passant noir
+        "4k3/8/8/8/8/3pP3/8/4K3 b - e3 0 1",
+
+        # Compteurs non nuls
+        "4k3/8/8/8/8/8/8/4K3 b - - 73 128",
+    ],
+)
+def test_to_fen(fen: str) -> None:
+    """Vérifie qu'une position est correctement reconvertie en FEN."""
+    position = Position(fen)
+
+    assert to_fen(position) == fen
+
+
+@pytest.mark.parametrize(
+    "fen, expected",
+    [
+        (
+            "8/8/8/8/8/8/8/8",
+            "8/8/8/8/8/8/8/8",
+        ),
+        (
+            "4K3/8/8/8/8/8/8/8",
+            "4K3/8/8/8/8/8/8/8",
+        ),
+        (
+            "8/8/8/8/8/8/8/4k3",
+            "8/8/8/8/8/8/8/4k3",
+        ),
+        (
+            "RNBQKBNR/8/8/8/8/8/8/rnbqkbnr",
+            "RNBQKBNR/8/8/8/8/8/8/rnbqkbnr",
+        ),
+        (
+            "r3k2r/8/8/8/8/8/8/R3K2R",
+            "r3k2r/8/8/8/8/8/8/R3K2R",
+        ),
+        (
+            "8/pppppppp/8/8/8/8/PPPPPPPP/8",
+            "8/pppppppp/8/8/8/8/PPPPPPPP/8",
+        ),
+        (
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+        ),
+        (
+            "r3k2r/pp1q1ppp/2npbn2/8/8/2NPBN2/PP1Q1PPP/R3K2R",
+            "r3k2r/pp1q1ppp/2npbn2/8/8/2NPBN2/PP1Q1PPP/R3K2R",
+        ),
+    ],
+)
+def test_bitboards_to_fen(fen: str, expected: str) -> None:
+    """Vérifie la conversion des bitboards vers la partie plateau de la FEN."""
+    position = Position(f"{fen} w - - 0 1")
+
+    assert bitboards_to_fen(position.piece_bitboards) == expected
+
+
+def test_to_fen_preserves_all_fen_fields() -> None:
+    """Vérifie que to_fen ne perd aucune information de la position."""
+    fen = "r3k2r/pp1q1ppp/2npbn2/8/3P4/2N1PN2/PPQ2PPP/R3K2R b KQkq e3 17 42"
+
+    position = Position(fen)
+
+    assert to_fen(position) == fen
+
+
+def test_bitboards_to_fen_with_empty_ranks() -> None:
+    """Vérifie la représentation des rangs entièrement vides."""
+    fen = "8/8/8/8/8/8/8/4K3"
+
+    position = Position(f"{fen} w - - 0 1")
+
+    assert bitboards_to_fen(position.piece_bitboards) == fen
+
+
+def test_bitboards_to_fen_with_consecutive_empty_squares() -> None:
+    """Vérifie la compression des cases vides consécutives."""
+    fen = "r6k/8/8/8/8/8/8/R6K"
+
+    position = Position(f"{fen} w - - 0 1")
+
+    assert bitboards_to_fen(position.piece_bitboards) == fen
+
+
+def test_bitboards_to_fen_with_multiple_empty_groups() -> None:
+    """Vérifie plusieurs groupes de cases vides sur un même rang."""
+    fen = "r2q3k/8/8/8/8/8/8/R2Q3K"
+
+    position = Position(f"{fen} w - - 0 1")
+
+    assert bitboards_to_fen(position.piece_bitboards) == fen
