@@ -22,6 +22,8 @@ RANK_8: int = 0x00000000000000FF
 
 INITIAL_FEN: str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
+ASCII_VALUE: int = 97
+
 KNIGHT_DIRECTIONS: tuple[tuple[int, int], ...] = (
     (2, 1), 
     (2, -1), 

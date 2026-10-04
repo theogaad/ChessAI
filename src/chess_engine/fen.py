@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import re
 from typing import TYPE_CHECKING
 
+from src.chess_engine.constants import BOARD_SIZE, ASCII_VALUE
 from src.chess_engine.types import Color, PieceType, CastlingRights
 from src.chess_engine.piece_bitboards import PieceBitboards
 
@@ -113,7 +114,7 @@ def fen_to_bitboards(string: str) -> PieceBitboards:
     """
     lines: list[str] = string.split('/')
 
-    if len(lines) != 8:
+    if len(lines) != BOARD_SIZE:
         raise ValueError("La partie positionnelle d'une FEN doit contenir huit rangées.")
 
     piece_bitboards: PieceBitboards = PieceBitboards((0, ) * 12)
@@ -122,22 +123,22 @@ def fen_to_bitboards(string: str) -> PieceBitboards:
         file_index: int = 0
 
         for char in rank:
-            if char in "12345678":
+            if char in ''.join([str(i) for i in range(1, BOARD_SIZE + 1)]): # Crée la chaîne "1234..." jusqu'à BOARD_SIZE
                 file_index += int(char)
                 continue
 
             else:
-                if file_index >= 8:
+                if file_index >= BOARD_SIZE:
                     raise ValueError("Une rangée FEN contient plus de huit cases.")
                 
                 color, piece_type = fen_to_piece(char)
-                square: int = rank_index * 8 + (7 - file_index)
+                square: int = rank_index * BOARD_SIZE + (BOARD_SIZE - file_index - 1)
 
                 piece_bitboards.add_piece(color, piece_type, square)
 
                 file_index += 1
 
-        if file_index != 8:
+        if file_index != BOARD_SIZE:
             raise ValueError("Une rangée FEN doit représenter exactement huit cases.")
 
     return piece_bitboards
@@ -261,8 +262,8 @@ def fen_to_en_passant_square(string: str) -> int | None:
     if string == '-':
         return None
 
-    elif re.fullmatch(r"[a-h][1-8]", string):
-        return (8 - int(string[1])) * 8 + (8 - (ord(string[0]) - 97) - 1)
+    elif re.search(f"^[{chr(ASCII_VALUE)}-{chr(ASCII_VALUE + BOARD_SIZE - 1)}][1-{BOARD_SIZE}]$", string):
+        return (BOARD_SIZE - int(string[1])) * BOARD_SIZE + (BOARD_SIZE - (ord(string[0]) - ASCII_VALUE) - 1)
 
     else:
         raise ValueError(f"fen_to_en_passant_square(string) : '{string}' n'est pas une chaîne valide.")
