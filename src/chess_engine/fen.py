@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 import re
 from typing import TYPE_CHECKING
@@ -218,7 +220,7 @@ def fen_to_castling_rights(string: str) -> CastlingRights:
     if string == '-':
         return CastlingRights.NONE
 
-    elif not len(string) <= 4:
+    elif not 0 < len(string) <= 4:
         raise ValueError(f"fen_to_castling_rights(string) : string doit contenir 4 caractères maximum.")
 
     elif len(string) != len(set(string)):
