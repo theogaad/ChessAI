@@ -1,5 +1,12 @@
+from src.chess_engine.types import Color, PieceType
+
 BOARD_SIZE: int = 8
 NUMBER_OF_SQUARES: int = 64
+
+COLOR_NUMBER: int = len(Color)
+PIECE_TYPE_NUMBER: int = len(PieceType)
+DIFFERENT_PIECES_NUMBER: int = COLOR_NUMBER * PIECE_TYPE_NUMBER
+
 BOARD_MASK: int = 0xFFFFFFFFFFFFFFFF
 
 FILE_A: int = 0x8080808080808080

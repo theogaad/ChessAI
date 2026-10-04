@@ -1,3 +1,4 @@
+from src.chess_engine.constants import PIECE_TYPE_NUMBER, DIFFERENT_PIECES_NUMBER
 from src.chess_engine.types import Color, PieceType
 from typing import TypeAlias
 
@@ -33,7 +34,7 @@ class PieceBitboards:
     fréquentes utilisées notamment lors de la recherche de coups.
 
     Attributes:
-        _bitboards: Bitboards des douze combinaisons de couleur et de type
+        _bitboards: Bitboards des combinaisons de couleur et de type
             de pièce.
         _white_pieces: Bitboard contenant toutes les pièces blanches.
         _black_pieces: Bitboard contenant toutes les pièces noires.
@@ -47,32 +48,26 @@ class PieceBitboards:
         de couleur et de type de pièce défini par la classe.
 
         Args:
-            bitboards: Tuple contenant les douze bitboards des pièces.
+            bitboards: Tuple contenant tous les bitboards des pièces.
         """
         self._bitboards: list[int] = list(bitboards)
-        self._white_pieces: int = bitboards[0] | bitboards[1] | bitboards[2] | bitboards[3] | bitboards[4] | bitboards[5]
-        self._black_pieces: int = bitboards[6] | bitboards[7] | bitboards[8] | bitboards[9] | bitboards[10] | bitboards[11]
+        self._white_pieces: int = 0
+        self._black_pieces: int = 0
+
+        for i in range(PIECE_TYPE_NUMBER):
+            self._white_pieces |= bitboards[i]
+            self._black_pieces |= bitboards[PIECE_TYPE_NUMBER + i]
+
         self._occupied: int = self._white_pieces | self._black_pieces
 
     @property
     def bitboards(self) -> TupleBitboards:
-        """Retourne les bitboards des douze combinaisons de pièces.
+        """Retourne les bitboards de toutes les combinaisons de pièces.
 
         Returns:
-            Un tuple contenant les douze bitboards.
+            Un tuple contenant tous les bitboards.
         """
-        return (self._bitboards[0], 
-                self._bitboards[1], 
-                self._bitboards[2], 
-                self._bitboards[3], 
-                self._bitboards[4], 
-                self._bitboards[5], 
-                self._bitboards[6], 
-                self._bitboards[7], 
-                self._bitboards[8], 
-                self._bitboards[9], 
-                self._bitboards[10], 
-                self._bitboards[11])
+        return tuple([self._bitboards[i] for i in range(DIFFERENT_PIECES_NUMBER)])
 
     @property
     def white_pieces(self) -> int:
@@ -119,7 +114,7 @@ class PieceBitboards:
 
         """
         square_mask: int = 1 << square
-        bitboard_index: int = color.value * 6 + piece_type.value
+        bitboard_index: int = color.value * PIECE_TYPE_NUMBER + piece_type.value
         self._bitboards[bitboard_index] |= square_mask
 
         if color is Color.WHITE:
@@ -148,7 +143,7 @@ class PieceBitboards:
 
         """
         square_mask: int = 1 << square
-        bitboard_index: int = color.value * 6 + piece_type.value
+        bitboard_index: int = color.value * PIECE_TYPE_NUMBER + piece_type.value
         self._bitboards[bitboard_index] &= ~square_mask
 
         if color is Color.WHITE:
@@ -182,7 +177,7 @@ class PieceBitboards:
 
     def clear(self) -> None:
         """Retire toutes les pièces des bitboards."""
-        for i in range(12):
+        for i in range(DIFFERENT_PIECES_NUMBER):
             self._bitboards[i] = 0
 
         self._white_pieces = 0
@@ -225,5 +220,5 @@ class PieceBitboards:
             Le bitboard correspondant à la combinaison de couleur et de
             type de pièce demandée.
         """
-        bitboard_index: int = color.value * 6 + piece_type.value
+        bitboard_index: int = color.value * PIECE_TYPE_NUMBER + piece_type.value
         return self._bitboards[bitboard_index]
