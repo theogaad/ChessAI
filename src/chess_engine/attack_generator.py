@@ -1,5 +1,7 @@
-from src.chess_engine.types import Color
+from src.chess_engine.constants import BOARD_SIZE, NUMBER_OF_SQUARES, KNIGHT_DIRECTIONS, BISHOP_DIRECTIONS, ROOK_DIRECTIONS
+from src.chess_engine.piece_bitboards import PieceBitboards
 from src.chess_engine.position import Position
+from src.chess_engine.types import Color, PieceType
 
 
 class AttackGenerator:
@@ -33,7 +35,45 @@ class AttackGenerator:
         Les tables d'attaques des pions, cavaliers et rois sont calculées
         lors de l'initialisation.
         """
-        # TODO
+        self._white_pawn_attacks: list[int] = [0 for _ in range(NUMBER_OF_SQUARES)]
+        self._black_pawn_attacks: list[int] = [0 for _ in range(NUMBER_OF_SQUARES)]
+        self._knight_attacks: list[int] = [0 for _ in range(NUMBER_OF_SQUARES)]
+        self._king_attacks: list[int] = [0 for _ in range(NUMBER_OF_SQUARES)]
+
+        for square in range(NUMBER_OF_SQUARES):
+            if square > (BOARD_SIZE - 1):
+                self._king_attacks[square] |= (1 << square) >> BOARD_SIZE
+                
+                if square % BOARD_SIZE != 0:
+                    self._white_pawn_attacks[square] |= (1 << square) >> (BOARD_SIZE + 1)
+                    self._king_attacks[square] |= (1 << square) >> 1 | (1 << square) >> (BOARD_SIZE + 1)
+                    
+                if square % BOARD_SIZE != (BOARD_SIZE - 1):
+                    self._white_pawn_attacks[square] |= (1 << square) >> (BOARD_SIZE - 1)
+                    self._king_attacks[square] |= (1 << square) << 1 | (1 << square) >> (BOARD_SIZE - 1)
+
+            if square < NUMBER_OF_SQUARES - BOARD_SIZE:
+                self._king_attacks[square] |= (1 << square) << BOARD_SIZE
+                
+                if square % BOARD_SIZE != 0:
+                    self._black_pawn_attacks[square] |= (1 << square) << (BOARD_SIZE - 1)
+                    self._king_attacks[square] |= (1 << square) >> 1 | (1 << square) << (BOARD_SIZE - 1)
+
+                if square % BOARD_SIZE != (BOARD_SIZE - 1):
+                    self._black_pawn_attacks[square] |= (1 << square) << (BOARD_SIZE + 1)
+                    self._king_attacks[square] |= (1 << square) << 1 | (1 << square) << (BOARD_SIZE + 1)
+
+            rank: int = square // BOARD_SIZE
+            file: int = square % BOARD_SIZE
+
+            for rank_offset, file_offset in KNIGHT_DIRECTIONS:
+                target_rank: int = rank + rank_offset
+                target_file: int = file + file_offset
+
+                if 0 <= target_rank < BOARD_SIZE and 0 <= target_file < BOARD_SIZE:
+                    target_square: int = target_rank * BOARD_SIZE + target_file
+                    self._knight_attacks[square] |= 1 << target_square
+
 
     def pawn_attacks(self, square: int, color: Color) -> int:
         """Retourne les cases attaquées par un pion.
@@ -45,7 +85,10 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par le pion.
         """
-        # TODO
+        if color is Color.WHITE:
+            return self._white_pawn_attacks[square]
+        
+        return self._black_pawn_attacks[square]
 
     def knight_attacks(self, square: int) -> int:
         """Retourne les cases attaquées par un cavalier.
@@ -56,7 +99,7 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par le cavalier.
         """
-        # TODO
+        return self._knight_attacks[square]
 
     def king_attacks(self, square: int) -> int:
         """Retourne les cases attaquées par un roi.
@@ -67,7 +110,7 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par le roi.
         """
-        # TODO
+        return self._king_attacks[square]
 
     def bishop_attacks(self, square: int, occupied: int) -> int:
         """Retourne les cases attaquées par un fou.
@@ -83,7 +126,26 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par le fou.
         """
-        # TODO
+        attacks: int = 0
+
+        rank: int = square // BOARD_SIZE
+        file: int = square % BOARD_SIZE
+
+        for rank_offset, file_offset in BISHOP_DIRECTIONS:
+            new_rank: int = rank + rank_offset
+            new_file: int = file + file_offset
+
+            while 0 <= new_rank < BOARD_SIZE and 0 <= new_file < BOARD_SIZE:
+                new_square: int = new_rank * BOARD_SIZE + new_file
+                attacks |= 1 << new_square
+
+                if 1 << new_square & occupied:
+                    break
+
+                new_rank += rank_offset
+                new_file += file_offset
+
+        return attacks
 
     def rook_attacks(self, square: int, occupied: int) -> int:
         """Retourne les cases attaquées par une tour.
@@ -99,7 +161,26 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par la tour.
         """
-        # TODO
+        attacks: int = 0
+        
+        rank: int = square // BOARD_SIZE
+        file: int = square % BOARD_SIZE
+
+        for rank_offset, file_offset in ROOK_DIRECTIONS:
+            new_rank: int = rank + rank_offset
+            new_file: int = file + file_offset
+
+            while 0 <= new_rank < BOARD_SIZE and 0 <= new_file < BOARD_SIZE:
+                new_square: int = new_rank * BOARD_SIZE + new_file
+                attacks |= 1 << new_square
+
+                if 1 << new_square & occupied:
+                    break
+
+                new_rank += rank_offset
+                new_file += file_offset
+
+        return attacks
 
     def queen_attacks(self, square: int, occupied: int) -> int:
         """Retourne les cases attaquées par une dame.
@@ -114,7 +195,7 @@ class AttackGenerator:
         Returns:
             Bitboard des cases attaquées par la dame.
         """
-        # TODO
+        return self.bishop_attacks(square, occupied) | self.rook_attacks(square, occupied)
 
     def is_square_attacked(
         self,
@@ -136,4 +217,29 @@ class AttackGenerator:
             True si la case est attaquée par au moins une pièce de la couleur
             spécifiée, sinon False.
         """
-        # TODO
+        bitboards: PieceBitboards = position.piece_bitboards
+        occupied: int = bitboards.occupied
+
+        king: int = bitboards.get_bitboard(by_color, PieceType.KING)
+        queen: int = bitboards.get_bitboard(by_color, PieceType.QUEEN)
+        rook: int = bitboards.get_bitboard(by_color, PieceType.ROOK)
+        bishop: int = bitboards.get_bitboard(by_color, PieceType.BISHOP)
+        knight: int = bitboards.get_bitboard(by_color, PieceType.KNIGHT)
+        pawn: int = bitboards.get_bitboard(by_color, PieceType.PAWN)
+
+        if self.king_attacks(square) & king:
+            return True
+
+        if self.rook_attacks(square, occupied) & (rook | queen):
+            return True
+
+        if self.bishop_attacks(square, occupied) & (bishop | queen):
+            return True
+
+        if self.knight_attacks(square) & knight:
+            return True
+
+        if self.pawn_attacks(square, by_color.opposite) & pawn:
+            return True
+
+        return False

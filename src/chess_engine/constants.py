@@ -21,3 +21,28 @@ RANK_7: int = 0x000000000000FF00
 RANK_8: int = 0x00000000000000FF
 
 INITIAL_FEN: str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+KNIGHT_DIRECTIONS: tuple[tuple[int, int], ...] = (
+    (2, 1), 
+    (2, -1), 
+    (-2, 1), 
+    (-2, -1), 
+    (1, 2), 
+    (1, -2), 
+    (-1, 2), 
+    (-1, -2)
+)
+
+BISHOP_DIRECTIONS: tuple[tuple[int, int], ...] = (
+    (1, 1),
+    (1, -1),
+    (-1, 1),
+    (-1, -1),
+)
+
+ROOK_DIRECTIONS: tuple[tuple[int, int], ...] = (
+    (1, 0),
+    (0, 1),
+    (-1, 0),
+    (0, -1),
+)
