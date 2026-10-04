@@ -267,10 +267,10 @@ def to_fen(position: Position) -> str:
     """Convertit une position en chaîne FEN.
 
     Args:
-        position: Position à convertir au format FEN.
+        position: Position à convertir.
 
     Returns:
-        Une chaîne représentant la position au format FEN.
+        Chaîne FEN représentant la position.
     """
     bitboards_info: str = bitboards_to_fen(position.piece_bitboards)
     side_to_move_info: str = color_to_fen(position.side_to_move)
@@ -282,6 +282,14 @@ def to_fen(position: Position) -> str:
     return f"{bitboards_info} {side_to_move_info} {castling_rights_info} {en_passant_square_info} {halfmove_clock_info} {fullmove_number_info}"
 
 def bitboards_to_fen(piece_bitboards: PieceBitboards) -> str:
+    """Convertit les bitboards des pièces en représentation FEN.
+
+    Args:
+        piece_bitboards: Bitboards représentant les pièces sur l'échiquier.
+
+    Returns:
+        Partie de la FEN représentant la position des pièces.
+    """
     fen_bitboards: str = ""
 
     for rank_index in range(BOARD_SIZE):
@@ -311,12 +319,28 @@ def bitboards_to_fen(piece_bitboards: PieceBitboards) -> str:
     return fen_bitboards
 
 def color_to_fen(color: Color) -> str:
+    """Convertit une couleur en notation FEN.
+
+    Args:
+        color: Couleur à convertir.
+
+    Returns:
+        Caractère FEN correspondant à la couleur.
+    """
     if color is Color.WHITE:
         return 'w'
 
     return 'b'
 
 def castling_rights_to_fen(castling_rights: CastlingRights) -> str:
+    """Convertit les droits de roque en notation FEN.
+
+    Args:
+        castling_rights: Droits de roque disponibles.
+
+    Returns:
+        Chaîne FEN représentant les droits de roque.
+    """
     if castling_rights is CastlingRights.NONE:
         return '-'
 
@@ -335,6 +359,14 @@ def castling_rights_to_fen(castling_rights: CastlingRights) -> str:
         return fen_castling_rights
 
 def en_passant_square_to_fen(en_passant_square: int | None) -> str:
+    """Convertit une case de prise en passant en notation FEN.
+
+    Args:
+        en_passant_square: Indice de la case, ou None si aucune case n'est disponible.
+
+    Returns:
+        Case en notation algébrique, ou « - » si aucune case n'est définie.
+    """
     if en_passant_square is None:
         return '-'
 
