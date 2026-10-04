@@ -1,3 +1,4 @@
+from src.chess_engine.fen import FENData, parse_fen
 from src.chess_engine.types import Color, CastlingRights
 from src.chess_engine.piece_bitboards import PieceBitboards
 
@@ -35,4 +36,10 @@ class Position:
         Args:
             fen: Chaîne représentant la position au format FEN.
         """
-        # TODO
+        fen_data: FENData = parse_fen(fen)
+        self.piece_bitboards: PieceBitboards = fen_data.piece_bitboards
+        self.side_to_move: Color = fen_data.side_to_move
+        self.castling_rights: CastlingRights = fen_data.castling_rights
+        self.en_passant_square: int | None = fen_data.en_passant_square
+        self.halfmove_clock: int = fen_data.halfmove_clock
+        self.fullmove_number: int = fen_data.fullmove_number
