@@ -139,7 +139,7 @@ def test_fen_to_bitboards_intitial_position() -> None:
     ), "Les bitboards renvoyés ne sont pas ceux attendus."
 
 def test_fen_to_bitboards_empty_position() -> None:
-    piece_bitboards = fen_to_bitboards("8/8/8/8/8/8/8/8")
+    piece_bitboards: PieceBitboards = fen_to_bitboards("8/8/8/8/8/8/8/8")
 
     assert piece_bitboards.bitboards == (0,) * 12, "Les bitboards renvoyés ne sont pas ceux attendus."
     assert piece_bitboards.occupied == 0, "Les bitboards renvoyés ne sont pas ceux attendus."
@@ -151,7 +151,7 @@ def test_fen_to_bitboards_empty_position() -> None:
     ("8/8/8/8/8/8/8/7K", 56, (Color.WHITE, PieceType.KING))
 ])
 def test_fen_to_bitboards_square_conversion(string, square, expected) -> None:
-    piece_bitboards = fen_to_bitboards(string)
+    piece_bitboards: PieceBitboards = fen_to_bitboards(string)
 
     assert piece_bitboards.get_piece_at(square) == expected, "Les bitboards renvoyés ne sont pas ceux attendus."
 
@@ -169,7 +169,7 @@ def test_fen_to_bitboards_invalid(string) -> None:
         fen_to_bitboards(string)
 
 def test_parse_fen_initial_position() -> None:
-    fen_data = parse_fen(INITIAL_FEN)
+    fen_data: FENData = parse_fen(INITIAL_FEN)
 
     assert fen_data.side_to_move is Color.WHITE
     assert fen_data.castling_rights == (
@@ -183,7 +183,7 @@ def test_parse_fen_initial_position() -> None:
     assert fen_data.fullmove_number == 1
 
 def test_parse_fen() -> None:
-    fen_data = parse_fen(
+    fen_data: FENData = parse_fen(
         "r3k2r/8/8/3pP3/8/8/8/R3K2R b Kq e6 17 42"
     )
 
