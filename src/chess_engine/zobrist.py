@@ -1,3 +1,7 @@
+import random
+
+from src.chess_engine.constants import (BOARD_SIZE, NUMBER_OF_SQUARES, PIECE_TYPE_NUMBER, DIFFERENT_PIECES_NUMBER, 
+                                        RANK_3, RANK_4, RANK_5, RANK_6)
 from src.chess_engine.position import Position
 from src.chess_engine.types import Color, PieceType, CastlingRights
 
@@ -33,7 +37,15 @@ class Zobrist:
                 de nombres aléatoires. Si None, une graine aléatoire est
                 utilisée.
         """
-        # TODO
+        random_generator = random.Random(seed)
+
+        self._piece_keys: list[list[int]] = [[random_generator.getrandbits(NUMBER_OF_SQUARES) for _ in range(NUMBER_OF_SQUARES)]
+                                             for _ in range(DIFFERENT_PIECES_NUMBER)]
+        self._side_to_move_key: int = random_generator.getrandbits(NUMBER_OF_SQUARES)
+        self._castling_keys: list[int] = [random_generator.getrandbits(NUMBER_OF_SQUARES) 
+                                          for _ in range(len(CastlingRights) - 1)]
+        self._en_passant_keys: list[int] = [random_generator.getrandbits(NUMBER_OF_SQUARES) 
+                                           for _ in range(BOARD_SIZE * 2)]
 
     def hash_position(self, position: Position) -> int:
         """Calcule le hash Zobrist complet d'une position.
@@ -44,7 +56,23 @@ class Zobrist:
         Returns:
             Valeur entière représentant le hash Zobrist de la position.
         """
-        # TODO
+        hash: int = 0
+
+        for square in range(NUMBER_OF_SQUARES):
+            piece: tuple[Color, PieceType] | None = position.piece_bitboards.get_piece_at(square)
+
+            if piece:
+                hash ^= self.piece_key(piece[0], piece[1], square)
+
+        if position.side_to_move is Color.BLACK:
+            hash ^= self.side_to_move_key()
+
+        hash ^= self.castling_key(position.castling_rights)
+
+        if position.en_passant_square is not None and self.en_passant_square_is_pertinent(position):
+            hash ^= self.en_passant_key(position.en_passant_square)
+
+        return hash
 
     def piece_key(
         self,
@@ -62,7 +90,7 @@ class Zobrist:
         Returns:
             Clé Zobrist correspondante.
         """
-        # TODO
+        return self._piece_keys[color.value * PIECE_TYPE_NUMBER + piece_type.value][square]
 
     def side_to_move_key(self) -> int:
         """Retourne la clé Zobrist associée au trait des Noirs.
@@ -70,7 +98,7 @@ class Zobrist:
         Returns:
             Clé Zobrist utilisée lorsque les Noirs doivent jouer.
         """
-        # TODO
+        return self._side_to_move_key
 
     def castling_key(self, castling_rights: CastlingRights) -> int:
         """Retourne la clé Zobrist associée aux droits de roque.
@@ -81,7 +109,18 @@ class Zobrist:
         Returns:
             Clé Zobrist correspondante.
         """
-        # TODO
+        castling_hash: int = 0
+
+        if castling_rights & CastlingRights.WHITE_KINGSIDE:
+            castling_hash ^= self._castling_keys[0]
+        if castling_rights & CastlingRights.WHITE_QUEENSIDE:
+            castling_hash ^= self._castling_keys[1]
+        if castling_rights & CastlingRights.BLACK_KINGSIDE:
+            castling_hash ^= self._castling_keys[2]
+        if castling_rights & CastlingRights.BLACK_QUEENSIDE:
+            castling_hash ^= self._castling_keys[3]
+
+        return castling_hash
 
     def en_passant_key(self, square: int) -> int:
         """Retourne la clé Zobrist associée à une case en passant.
@@ -92,4 +131,38 @@ class Zobrist:
         Returns:
             Clé Zobrist correspondante.
         """
-        # TODO
+        if square // BOARD_SIZE == 2:
+            return self._en_passant_keys[square - BOARD_SIZE * 2]
+
+        elif square // BOARD_SIZE == 5:
+            return self._en_passant_keys[square - BOARD_SIZE * (BOARD_SIZE - 3)]
+
+        else:
+            return 0
+
+    def en_passant_square_is_pertinent(self, position: Position) -> bool:
+        if position.en_passant_square is None:
+            return False
+        
+        en_passant_square: int = position.en_passant_square
+        pawn_squares: int = 0
+
+        if en_passant_square // BOARD_SIZE == 2:
+            pawn_bitboard: int = position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.PAWN)
+
+            if en_passant_square % BOARD_SIZE != 0:
+                pawn_squares |= (1 << (en_passant_square + (BOARD_SIZE - 1)))
+
+            if en_passant_square % BOARD_SIZE != (BOARD_SIZE - 1):
+                pawn_squares |= (1 << (en_passant_square + (BOARD_SIZE + 1)))
+
+        elif en_passant_square // BOARD_SIZE == (BOARD_SIZE - 3):
+            pawn_bitboard: int = position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.PAWN)
+
+            if en_passant_square % BOARD_SIZE != 0:
+                pawn_squares |= (1 << (en_passant_square - (BOARD_SIZE + 1)))
+
+            if en_passant_square % BOARD_SIZE != (BOARD_SIZE - 1):
+                pawn_squares |= (1 << (en_passant_square - (BOARD_SIZE - 1)))
+
+        return pawn_squares & pawn_bitboard != 0
