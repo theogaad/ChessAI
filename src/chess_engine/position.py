@@ -24,7 +24,9 @@ class Position:
             déplacement de pion ou de la dernière capture.
         fullmove_number: Numéro du coup complet dans la partie. Commence à 1
             et est incrémenté après chaque coup des Noirs.
-
+        zobrist_hash: Hash Zobrist représentant l'état actuel de la position.
+            Il est mis à jour lors de l'application et de l'annulation des
+            coups.
     """
 
     def __init__(self, fen: str) -> None:
@@ -32,6 +34,9 @@ class Position:
 
         La chaîne FEN est utilisée pour initialiser l'ensemble des attributs
         de la position.
+
+        Le zobrist hash est initialisé à 0 et devra être modifié correctement 
+        après l'initialisation de cette position.
 
         Args:
             fen: Chaîne représentant la position au format FEN.
@@ -43,3 +48,4 @@ class Position:
         self.en_passant_square: int | None = fen_data.en_passant_square
         self.halfmove_clock: int = fen_data.halfmove_clock
         self.fullmove_number: int = fen_data.fullmove_number
+        self.zobrist_hash: int = 0
