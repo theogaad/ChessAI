@@ -109,8 +109,7 @@ class MoveGenerator:
                     pseudo_legal_squares = self._attack_generator.king_attacks(square)
                     pseudo_legal_moves.extend(self.generate_castling_moves(
                         position, 
-                        color, 
-                        piece_type, 
+                        color,  
                         square
                     ))
                 case PieceType.QUEEN:
@@ -152,11 +151,11 @@ class MoveGenerator:
                             MoveType.EN_PASSANT
                         ))
 
-            if color is Color.WHITE:
-                pseudo_legal_squares &= ~position.piece_bitboards.white_pieces
-
-            else:
-                pseudo_legal_squares &= ~position.piece_bitboards.black_pieces
+            ally_pieces: int = (position.piece_bitboards.white_pieces 
+                                if color is Color.WHITE 
+                                else position.piece_bitboards.black_pieces)
+            
+            pseudo_legal_squares &= ~ally_pieces
 
             while pseudo_legal_squares != 0:
                 pseudo_legal_square: int = pseudo_legal_squares.bit_length() - 1
