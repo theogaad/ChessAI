@@ -1,7 +1,12 @@
 import random
 
-from src.chess_engine.constants import (BOARD_SIZE, NUMBER_OF_SQUARES, PIECE_TYPE_NUMBER, DIFFERENT_PIECES_NUMBER, 
-                                        RANK_3, RANK_4, RANK_5, RANK_6)
+from src.chess_engine.constants import (
+    BOARD_SIZE, 
+    NUMBER_OF_SQUARES, 
+    PIECE_TYPE_NUMBER, 
+    DIFFERENT_PIECES_NUMBER, 
+    CASTLING_RIGHTS_NUMBER, 
+)
 from src.chess_engine.position import Position
 from src.chess_engine.types import Color, PieceType, CastlingRights
 
@@ -43,7 +48,7 @@ class Zobrist:
                                              for _ in range(DIFFERENT_PIECES_NUMBER)]
         self._side_to_move_key: int = random_generator.getrandbits(NUMBER_OF_SQUARES)
         self._castling_keys: list[int] = [random_generator.getrandbits(NUMBER_OF_SQUARES) 
-                                          for _ in range(len(CastlingRights) - 1)]
+                                          for _ in range(CASTLING_RIGHTS_NUMBER)]
         self._en_passant_keys: list[int] = [random_generator.getrandbits(NUMBER_OF_SQUARES) 
                                            for _ in range(BOARD_SIZE * 2)]
 
@@ -146,9 +151,10 @@ class Zobrist:
         
         en_passant_square: int = position.en_passant_square
         pawn_squares: int = 0
+        pawn_bitboard: int = 0
 
-        if en_passant_square // BOARD_SIZE == 2:
-            pawn_bitboard: int = position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.PAWN)
+        if en_passant_square // BOARD_SIZE == 2 and position.side_to_move is Color.WHITE:
+            pawn_bitboard = position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.PAWN)
 
             if en_passant_square % BOARD_SIZE != 0:
                 pawn_squares |= (1 << (en_passant_square + (BOARD_SIZE - 1)))
@@ -156,8 +162,8 @@ class Zobrist:
             if en_passant_square % BOARD_SIZE != (BOARD_SIZE - 1):
                 pawn_squares |= (1 << (en_passant_square + (BOARD_SIZE + 1)))
 
-        elif en_passant_square // BOARD_SIZE == (BOARD_SIZE - 3):
-            pawn_bitboard: int = position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.PAWN)
+        elif en_passant_square // BOARD_SIZE == (BOARD_SIZE - 3) and position.side_to_move is Color.BLACK:
+            pawn_bitboard = position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.PAWN)
 
             if en_passant_square % BOARD_SIZE != 0:
                 pawn_squares |= (1 << (en_passant_square - (BOARD_SIZE + 1)))
