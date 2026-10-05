@@ -65,7 +65,9 @@ class MoveExecutor:
         # Annulation du zobrist
         zobrist_hash: int = previous_zobrist_hash
         zobrist_hash ^= self._zobrist.castling_key(previous_castling_rights)
-        zobrist_hash ^= self._zobrist.en_passant_key(previous_en_passant_square)
+
+        if self._zobrist.en_passant_square_is_pertinent(position):
+            zobrist_hash ^= self._zobrist.en_passant_key(previous_en_passant_square)
 
         # Application du move
         if captured_piece is not None:
