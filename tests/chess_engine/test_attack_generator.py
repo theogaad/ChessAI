@@ -423,3 +423,42 @@ def test_is_square_attacked(
         f"Résultat incorrect pour la case {square}, "
         f"la couleur {by_color.name} et le FEN '{fen}'."
     )
+
+@pytest.mark.parametrize(
+    ("fen", "color", "expected"),
+    [
+        # Roi blanc en échec par une tour.
+        (
+            "4k3/8/8/8/8/8/4r3/4K3 w - - 0 1",
+            Color.WHITE,
+            True,
+        ),
+        # Roi blanc non attaqué.
+        (
+            "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+            Color.WHITE,
+            False,
+        ),
+        # Roi noir en échec par une tour.
+        (
+            "4k3/4R3/8/8/8/8/8/4K3 b - - 0 1",
+            Color.BLACK,
+            True,
+        ),
+        # Roi noir non attaqué.
+        (
+            "4k3/8/8/8/8/8/8/4K3 b - - 0 1",
+            Color.BLACK,
+            False,
+        ),
+    ],
+)
+def test_is_king_in_check(
+    attack_generator: AttackGenerator,
+    fen: str,
+    color: Color,
+    expected: bool,
+) -> None:
+    position = Position(fen)
+
+    assert attack_generator.is_king_in_check(position, color) is expected

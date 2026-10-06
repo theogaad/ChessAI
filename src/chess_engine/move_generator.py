@@ -65,7 +65,7 @@ class MoveGenerator:
         for move in pseudo_legal_moves:
             undo_info: UndoInfo = self._move_executor.make_move(position, move)
 
-            if not self.is_king_in_check(position):
+            if not self.is_king_in_check(position, position.side_to_move.opposite):
                 legal_moves.append(move)
 
             self._move_executor.undo_move(position, move, undo_info)
@@ -238,7 +238,11 @@ class MoveGenerator:
 
         return castling_moves
 
-    def is_king_in_check(self, position: Position) -> bool:
+    def is_king_in_check(
+        self, 
+        position: Position, 
+        color: Color
+    ) -> bool:
         """Indique si le roi d'une couleur est actuellement en échec.
 
         Args:
@@ -249,4 +253,4 @@ class MoveGenerator:
             ``True`` si le roi de la couleur indiquée est attaqué par une pièce
             adverse, sinon ``False``.
         """
-        return self._attack_generator.is_king_in_check(position)
+        return self._attack_generator.is_king_in_check(position, color)

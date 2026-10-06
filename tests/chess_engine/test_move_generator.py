@@ -374,3 +374,42 @@ def test_generate_legal_moves_does_not_modify_position(
     from src.chess_engine.fen import to_fen
 
     assert to_fen(position) == initial_fen
+
+@pytest.mark.parametrize(
+    ("fen", "color", "expected"),
+    [
+        # Roi blanc en échec par une tour.
+        (
+            "4k3/8/8/8/8/8/4r3/4K3 w - - 0 1",
+            Color.WHITE,
+            True,
+        ),
+        # Roi blanc non attaqué.
+        (
+            "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+            Color.WHITE,
+            False,
+        ),
+        # Roi noir en échec par une tour.
+        (
+            "4k3/4R3/8/8/8/8/8/4K3 b - - 0 1",
+            Color.BLACK,
+            True,
+        ),
+        # Roi noir non attaqué.
+        (
+            "4k3/8/8/8/8/8/8/4K3 b - - 0 1",
+            Color.BLACK,
+            False,
+        ),
+    ],
+)
+def test_is_king_in_check(
+    move_generator: MoveGenerator,
+    fen: str,
+    color: Color,
+    expected: bool,
+) -> None:
+    position = Position(fen)
+
+    assert move_generator.is_king_in_check(position, color) is expected

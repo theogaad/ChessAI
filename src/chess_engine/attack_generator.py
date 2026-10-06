@@ -76,7 +76,8 @@ class AttackGenerator:
 
     def is_king_in_check(
         self, 
-        position: Position
+        position: Position, 
+        color: Color
     ) -> bool:
         """Indique si le roi d'une couleur est actuellement en échec.
 
@@ -91,10 +92,10 @@ class AttackGenerator:
         return self.is_square_attacked(
             position, 
             position.piece_bitboards.get_bitboard(
-                position.side_to_move, 
+                color, 
                 PieceType.KING
             ).bit_length() - 1, 
-            position.side_to_move.opposite
+            color.opposite
         )
 
     def pawn_attacks(self, square: int, color: Color) -> int:

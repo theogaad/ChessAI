@@ -30,7 +30,7 @@ class Player(ABC):
         Args:
             color: Couleur des pièces contrôlées par le joueur.
         """
-        # TODO
+        self.color: Color = color
 
     @abstractmethod
     def choose_move(

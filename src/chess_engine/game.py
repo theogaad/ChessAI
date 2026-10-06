@@ -148,7 +148,7 @@ class Game:
         self.draw_reason = None
 
         if len(self.legal_moves()) == 0:
-            if self._move_generator.is_king_in_check(self.position):
+            if self._move_generator.is_king_in_check(self.position, self.position.side_to_move):
                 self.status = GameStatus.CHECKMATE
 
             else:
