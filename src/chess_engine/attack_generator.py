@@ -74,6 +74,18 @@ class AttackGenerator:
                     target_square: int = target_rank * BOARD_SIZE + target_file
                     self._knight_attacks[square] |= 1 << target_square
 
+    def is_king_in_check(
+        self, 
+        position: Position
+    ) -> bool:
+        return self.is_square_attacked(
+            position, 
+            position.piece_bitboards.get_bitboard(
+                position.side_to_move, 
+                PieceType.KING
+            ).bit_length() - 1, 
+            position.side_to_move.opposite
+        )
 
     def pawn_attacks(self, square: int, color: Color) -> int:
         """Retourne les cases attaquées par un pion.

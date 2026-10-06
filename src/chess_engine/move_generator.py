@@ -65,11 +65,7 @@ class MoveGenerator:
         for move in pseudo_legal_moves:
             undo_info: UndoInfo = self._move_executor.make_move(position, move)
 
-            if not self._attack_generator.is_square_attacked(
-                position, 
-                position.piece_bitboards.get_bitboard(position.side_to_move.opposite, PieceType.KING).bit_length() - 1, 
-                position.side_to_move
-            ):
+            if not self.is_king_in_check(position):
                 legal_moves.append(move)
 
             self._move_executor.undo_move(position, move, undo_info)
@@ -241,3 +237,6 @@ class MoveGenerator:
                 )
 
         return castling_moves
+
+    def is_king_in_check(self, position: Position) -> bool:
+        return self._attack_generator.is_king_in_check(position)

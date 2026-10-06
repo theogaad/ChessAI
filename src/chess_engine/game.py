@@ -4,7 +4,8 @@ from src.chess_engine.move_executor import MoveExecutor
 from src.chess_engine.move_generator import MoveGenerator
 from src.chess_engine.player import Player
 from src.chess_engine.position import Position
-from src.chess_engine.types import Color, DrawReason, GameStatus
+from src.chess_engine.types import Color, PieceType, DrawReason, GameStatus
+from src.chess_engine.undo_info import UndoInfo
 from src.chess_engine.zobrist import Zobrist
 
 class Game:
@@ -61,7 +62,18 @@ class Game:
                 coups.
             zobrist: Instance utilisée pour calculer les hashes Zobrist.
         """
-        # TODO
+        self.position: Position = Position(fen)
+        zobrist_hash: int = zobrist.hash_position(self.position)
+        self.position.zobrist_hash = zobrist_hash
+        self.white_player: Player = white_player
+        self.black_player: Player = black_player
+        self.history: History = History(zobrist_hash)
+        self.status: GameStatus = GameStatus.ONGOING
+        self.draw_reason: DrawReason | None = None
+        self._move_generator: MoveGenerator = move_generator
+        self._move_executor: MoveExecutor = move_executor
+        self._zobrist: Zobrist = zobrist
+        self.update_status()
 
     def current_player(self) -> Player:
         """Retourne le joueur dont c'est le tour.
@@ -70,7 +82,9 @@ class Game:
             Le joueur correspondant à la couleur indiquée par
             ``position.side_to_move``.
         """
-        # TODO
+        if self.position.side_to_move is Color.WHITE:
+            return self.white_player
+        return self.black_player
 
     def legal_moves(self) -> list[Move]:
         """Retourne les coups légaux de la position actuelle.
@@ -78,7 +92,7 @@ class Game:
         Returns:
             Liste des coups légaux disponibles pour le joueur actif.
         """
-        # TODO
+        return self._move_generator.generate_legal_moves(self.position)
 
     def make_move(self, move: Move) -> None:
         """Joue un coup et met à jour l'état de la partie.
@@ -91,8 +105,20 @@ class Game:
 
         Args:
             move: Coup à jouer.
+        
+        Raises:
+            ValueError: Si le mouvement n'est pas légal.
         """
-        # TODO
+        if move not in self.legal_moves():
+            raise ValueError("Le mouvement n'est pas légal.")
+        
+        undo_info: UndoInfo = self._move_executor.make_move(self.position, move)
+        self.history.add(
+            move, 
+            undo_info, 
+            self.position.zobrist_hash
+        )
+        self.update_status()
 
     def undo_move(self) -> None:
         """Annule le dernier coup joué.
@@ -103,7 +129,13 @@ class Game:
         Raises:
             IndexError: Si aucun coup n'a été joué dans la partie.
         """
-        # TODO
+        self._move_executor.undo_move(
+            self.position, 
+            self.history.get_last_move(), 
+            self.history.get_last_undo_info()
+        )
+        self.history.remove_last()
+        self.update_status()
 
     def update_status(self) -> None:
         """Met à jour le statut de la partie.
@@ -112,4 +144,52 @@ class Game:
         des différentes conditions de fin de partie, notamment l'échec et
         mat, le pat et les conditions de nulle.
         """
-        # TODO
+        self.status = GameStatus.ONGOING
+        self.draw_reason = None
+        
+        if len(self.legal_moves()) == 0:
+            if self._move_generator.is_king_in_check(self.position):
+                self.status = GameStatus.CHECKMATE
+
+            else:
+                self.status = GameStatus.STALEMATE
+
+        elif self.history.count_position(self.position.zobrist_hash) >= 3:
+            self.status = GameStatus.DRAW
+            self.draw_reason = DrawReason.REPETITION
+
+        elif self.position.halfmove_clock >= 100:
+            self.status = GameStatus.DRAW
+            self.draw_reason = DrawReason.FIFTY_MOVES
+
+        elif self.is_insufficient_material():
+            self.status = GameStatus.DRAW
+            self.draw_reason = DrawReason.INSUFFICIENT_MATERIAL
+
+    def is_insufficient_material(self) -> bool:
+        for color in Color:
+            for piece_type in [
+                PieceType.QUEEN, 
+                PieceType.ROOK, 
+                PieceType.PAWN
+            ]:
+                if self.position.piece_bitboards.get_bitboard(color, piece_type) != 0:
+                    return False
+
+        pieces_count: int = self.position.piece_bitboards.occupied.bit_count()
+        if pieces_count <= 3:
+            return True
+
+        white_knights_count: int = self.position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.KNIGHT).bit_count()
+        black_knights_count: int = self.position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.KNIGHT).bit_count()
+        white_bishops_count: int = self.position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.BISHOP).bit_count()
+        black_bishops_count: int = self.position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.BISHOP).bit_count()
+        knights_count: int = white_knights_count + black_knights_count
+        
+        white_bishop_square: int = self.position.piece_bitboards.get_bitboard(Color.WHITE, PieceType.BISHOP).bit_length() - 1
+        black_bishop_square: int = self.position.piece_bitboards.get_bitboard(Color.BLACK, PieceType.BISHOP).bit_length() - 1
+        if (knights_count == 0 and white_bishops_count == 1 and black_bishops_count == 1 and
+            abs(white_bishop_square - black_bishop_square) % 2 == 0):
+            return True
+
+        return False

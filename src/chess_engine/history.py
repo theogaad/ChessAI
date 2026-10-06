@@ -64,6 +64,11 @@ class History:
         Raises:
             IndexError: Si l'historique est vide.
         """
+        if (len(self.moves) == 0 or 
+            len(self.undo_infos) == 0 or 
+            len(self.zobrist_hashes) == 0):
+            raise IndexError("Un des historique est vide.")
+        
         self.moves.pop()
         self.undo_infos.pop()
         self.zobrist_hashes.pop()
