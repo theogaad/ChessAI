@@ -47,4 +47,3 @@ class Player(ABC):
         Returns:
             Le coup choisi par le joueur.
         """
-        # TODO
