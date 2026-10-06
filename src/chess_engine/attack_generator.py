@@ -78,6 +78,16 @@ class AttackGenerator:
         self, 
         position: Position
     ) -> bool:
+        """Indique si le roi d'une couleur est actuellement en échec.
+
+        Args:
+            position: Position dans laquelle vérifier l'état du roi.
+            color: Couleur du roi à vérifier.
+
+        Returns:
+            ``True`` si le roi de la couleur indiquée est attaqué par une pièce
+            adverse, sinon ``False``.
+        """
         return self.is_square_attacked(
             position, 
             position.piece_bitboards.get_bitboard(

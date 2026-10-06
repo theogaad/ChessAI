@@ -146,7 +146,7 @@ class Game:
         """
         self.status = GameStatus.ONGOING
         self.draw_reason = None
-        
+
         if len(self.legal_moves()) == 0:
             if self._move_generator.is_king_in_check(self.position):
                 self.status = GameStatus.CHECKMATE
@@ -167,6 +167,21 @@ class Game:
             self.draw_reason = DrawReason.INSUFFICIENT_MATERIAL
 
     def is_insufficient_material(self) -> bool:
+        """Indique si la position contient un matériel insuffisant pour mater.
+        
+        Une position est considérée comme ayant un matériel insuffisant lorsque 
+        aucun des joueurs ne possède de pion, de tour ou de dame et que la 
+        configuration restante ne permet pas de réaliser un échec et mat.
+        
+        Les configurations prises en compte comprennent notamment les positions 
+        roi contre roi, roi et cavalier contre roi, roi et fou contre roi, ainsi 
+        que les positions où chaque joueur ne possède qu'un fou et que les deux 
+        fous évoluent sur des cases de même couleur.
+        
+        Returns: 
+            ``True`` si le matériel est insuffisant pour réaliser un échec et mat, 
+            sinon ``False``.
+        """
         for color in Color:
             for piece_type in [
                 PieceType.QUEEN, 

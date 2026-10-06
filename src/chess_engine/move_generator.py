@@ -239,4 +239,14 @@ class MoveGenerator:
         return castling_moves
 
     def is_king_in_check(self, position: Position) -> bool:
+        """Indique si le roi d'une couleur est actuellement en échec.
+
+        Args:
+            position: Position dans laquelle vérifier l'état du roi.
+            color: Couleur du roi à vérifier.
+
+        Returns:
+            ``True`` si le roi de la couleur indiquée est attaqué par une pièce
+            adverse, sinon ``False``.
+        """
         return self._attack_generator.is_king_in_check(position)
