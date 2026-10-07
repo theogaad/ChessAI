@@ -28,7 +28,21 @@ class UI(ABC):
             game: Partie en cours.
         """
 
+    @abstractmethod
+    def quitting(self) -> bool:
+        """Indique si l'interface graphique doit être fermée."""
+
     def piece_to_image_filename(self, color: Color, piece_type: PieceType) -> str:
+        """Transforme une couleur et un type de pièce en nom de fichier d'image.
+        
+        Args:
+            color: Couleur de la pièce donnée.
+            piece_type: Type de la pièce donnée.
+            
+        Returns:
+            Une chaîne de caractère représentant le nom du fichier de l'image ou 
+            unknown.png si la pièce n'est pas reconnue.
+        """
         color_str: str = "White" if color is Color.WHITE else "Black"
 
         match piece_type:

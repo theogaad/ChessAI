@@ -34,7 +34,7 @@ class Game:
         _move_generator: Générateur utilisé pour produire les coups légaux.
         _move_executor: Composant utilisé pour appliquer et annuler les
             coups.
-        _zobrist: Instance utilisée pour gérer les hashes des positions.
+        legal_moves: Liste des coups légaux de la position actuelle.
     """
 
     def __init__(
@@ -72,7 +72,7 @@ class Game:
         self.draw_reason: DrawReason | None = None
         self._move_generator: MoveGenerator = move_generator
         self._move_executor: MoveExecutor = move_executor
-        self._zobrist: Zobrist = zobrist
+        self.legal_moves: list[Move] = self.get_legal_moves()
         self.update_status()
 
     def current_player(self) -> Player:
@@ -86,7 +86,7 @@ class Game:
             return self.white_player
         return self.black_player
 
-    def legal_moves(self) -> list[Move]:
+    def get_legal_moves(self) -> list[Move]:
         """Retourne les coups légaux de la position actuelle.
 
         Returns:
@@ -109,7 +109,7 @@ class Game:
         Raises:
             ValueError: Si le mouvement n'est pas légal.
         """
-        if move not in self.legal_moves():
+        if move not in self.legal_moves:
             raise ValueError("Le mouvement n'est pas légal.")
         
         undo_info: UndoInfo = self._move_executor.make_move(self.position, move)
@@ -118,6 +118,7 @@ class Game:
             undo_info, 
             self.position.zobrist_hash
         )
+        self.legal_moves = self.get_legal_moves()
         self.update_status()
 
     def undo_move(self) -> None:
@@ -135,6 +136,7 @@ class Game:
             self.history.get_last_undo_info()
         )
         self.history.remove_last()
+        self.legal_moves = self.get_legal_moves()
         self.update_status()
 
     def update_status(self) -> None:
@@ -147,7 +149,7 @@ class Game:
         self.status = GameStatus.ONGOING
         self.draw_reason = None
 
-        if len(self.legal_moves()) == 0:
+        if len(self.legal_moves) == 0:
             if self._move_generator.is_king_in_check(self.position, self.position.side_to_move):
                 self.status = GameStatus.CHECKMATE
 

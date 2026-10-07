@@ -21,6 +21,10 @@ class PygameUI(UI):
                 self._images[(color, piece_type)] = pygame.image.load(
                     self.piece_to_image_filename(color, piece_type)
                 )
+                self._images[(color, piece_type)] = pygame.transform.scale(
+                    self._images[(color, piece_type)], 
+                    (CASE_SIZE, CASE_SIZE)
+                )
 
     def display_position(self, game: Game) -> None:
         """Affiche la position actuelle de la partie.
@@ -48,12 +52,20 @@ class PygameUI(UI):
         """
         pass
 
+    def quitting(self) -> bool:
+        """Indique si la fenêtre doit être fermée."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            
+        return False
+
     def display_board(self) -> None:
         """Affiche le plateau de jeu."""
         for rank in range(BOARD_SIZE):
             for file in range(BOARD_SIZE):
                 square: int = rank * BOARD_SIZE + file
-                pygame_color: tuple[int, int, int] = (100, 100, 100) if square % 2 == 0 else (255, 255, 255)
+                pygame_color: tuple[int, int, int] = (100, 100, 100) if (rank + file) % 2 == 0 else (255, 255, 255)
                 case_x, case_y = self.square_to_pygame_coordinate(square)
                 pygame.draw.rect(
                     self._screen, 

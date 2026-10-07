@@ -31,7 +31,7 @@ class Human(Player):
         self,
         position: Position,
         legal_moves: list[Move],
-    ) -> Move:
+    ) -> Move | None:
         """Attend et retourne le coup sélectionné par l'utilisateur.
         
         Cette méthode bloque son exécution jusqu'à ce qu'un coup soit fourni 

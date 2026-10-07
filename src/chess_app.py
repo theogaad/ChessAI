@@ -1,0 +1,120 @@
+from queue import Queue
+from threading import Thread, Event
+
+from src.chess_engine.attack_generator import AttackGenerator
+from src.chess_engine.constants import INITIAL_FEN
+from src.chess_engine.game import Game
+from src.chess_engine.human import Human
+from src.chess_engine.move import Move
+from src.chess_engine.move_executor import MoveExecutor
+from src.chess_engine.move_generator import MoveGenerator
+from src.chess_engine.player import Player
+from src.chess_engine.types import Color, MoveType, GameStatus
+from src.chess_engine.zobrist import Zobrist
+from src.user_interface.pygame_ui import PygameUI
+from src.user_interface.ui import UI
+
+
+class ChessApp:
+    """Orchestre l'interface utilisateur et le moteur d'échecs.
+    
+    L'application exécute l'interface utilisateur et la partie dans des 
+    threads distincts. Une file permet de transmettre les coups de l'interface 
+    vers les joueurs humains du moteur.
+    """
+
+    def __init__(self) -> None:
+        """Initialise les threads, la communication et les événements de l'application."""
+        self._game_thread: Thread = Thread(target=self.run_game)
+        self._ui_thread: Thread = Thread(target=self.run_ui)
+
+        self._ui_to_game_queue: Queue = Queue()
+        self._game_initialisation: Event = Event()
+        self._ui_initialisation: Event = Event()
+        self._stop_running: Event = Event()
+
+    def run(self) -> None:
+        """Lance l'interface utilisateur et la partie.
+        
+        Les deux composants sont exécutés dans des threads distincts. 
+        La méthode attend ensuite leur terminaison.
+        
+        Une fois les deux threads terminés, l'application se termine.
+        """
+        self._game_thread.start()
+        self._ui_thread.start()
+
+        self._game_thread.join()
+        self._ui_thread.join()
+
+        print("Partie finie :)")
+
+    def run_ui(self) -> None:
+        """Exécute la boucle principale de l'interface utilisateur.
+        
+        Initialise l'interface, attend l'initialisation du moteur, puis 
+        affiche continuellement la position actuelle et traite les 
+        interactions de l'utilisateur.
+        
+        La boucle est interrompue lorsque l'utilisateur demande à quitter 
+        l'application.
+        """
+        self.init_ui()
+        self._game_initialisation.wait()
+
+        while not self._stop_running.is_set():
+            if self._ui.quitting():
+                self._stop_running.set()
+                self._ui_to_game_queue.put(None)
+
+            self._ui.display_position(self._game)
+
+            # TODO: Transformer les clics en Move
+
+    def run_game(self) -> None:
+        """Exécute la boucle principale de la partie.
+        
+        Initialise le moteur, attend l'initialisation de l'interface, puis 
+        demande à chaque joueur de choisir un coup jusqu'à la fin de la 
+        partie ou l'arrêt de l'application.
+        
+        Un joueur humain peut bloquer en attendant qu'un coup soit transmis 
+        par l'interface utilisateur.
+        """
+        self.init_game()
+        self._ui_initialisation.wait()
+
+        while self._game.status == GameStatus.ONGOING and not self._stop_running.is_set():
+            current_player: Player = self._game.current_player()
+            move: Move = current_player.choose_move(self._game.position, self._game.legal_moves)
+
+            if move is not None:
+                self._game.make_move(move)
+
+    def init_ui(self) -> None:
+        """Initialise l'interface utilisateur de l'application."""
+        self._ui: UI = PygameUI()
+
+        self._ui_initialisation.set()
+
+    def init_game(self) -> None:
+        """Initialise les composants nécessaires au fonctionnement de la partie.
+        
+        Crée le générateur d'attaques, le générateur de coups, l'exécuteur 
+        de coups, le système Zobrist et la partie initiale.
+        """
+        fen: str = INITIAL_FEN
+        zobrist: Zobrist = Zobrist(42)
+        move_executor: MoveExecutor = MoveExecutor(zobrist)
+        move_generator: MoveGenerator = MoveGenerator(AttackGenerator(), move_executor)
+        
+        self._game: Game = Game(
+            fen, 
+            Human(Color.WHITE, self._ui_to_game_queue), 
+            Human(Color.BLACK, self._ui_to_game_queue), 
+            move_generator, 
+            move_executor, 
+            zobrist
+        )
+
+        self._game_initialisation.set()
