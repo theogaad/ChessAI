@@ -2,8 +2,7 @@ import pygame
 
 from src.chess_engine.constants import BOARD_SIZE, CASE_SIZE
 from src.chess_engine.game import Game
-from src.chess_engine.move import Move
-from src.chess_engine.types import Color, PieceType
+from src.chess_engine.types import Color, PieceType, EventType
 from src.user_interface.ui import UI
 
 
@@ -12,6 +11,7 @@ class PygameUI(UI):
 
     def __init__(self) -> None:
         """Initialise Pygame, la fenêtre et les images des pièces."""
+        super().__init__()
         pygame.init()
         self._screen: pygame.Surface = pygame.display.set_mode((BOARD_SIZE * CASE_SIZE, BOARD_SIZE * CASE_SIZE))
         self._images: dict[tuple[Color, PieceType], pygame.Surface] = {}
@@ -44,21 +44,20 @@ class PygameUI(UI):
 
         pygame.display.flip()
 
-    def get_move(self, game: Game) -> None:
-        """Récupère le coup joué par l'utilisateur et le transmet au moteur.
-
-        Args:
-            game: Partie en cours.
-        """
-        pass
-
-    def quitting(self) -> bool:
-        """Indique si la fenêtre doit être fermée."""
+    def update_event(self) -> int | None:
+        """Met à jour l'attribut event."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return True
-            
-        return False
+                self.event = EventType.QUIT
+                return None
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.event = EventType.CLICK
+                clicked_square: int = self.pygame_coordinate_to_square(event.pos)
+                return clicked_square
+
+        self.event = EventType.NONE
+        return None
 
     def display_board(self) -> None:
         """Affiche le plateau de jeu."""
@@ -96,3 +95,18 @@ class PygameUI(UI):
             (BOARD_SIZE - (square % BOARD_SIZE) - 1) * CASE_SIZE, 
             (square // BOARD_SIZE) * CASE_SIZE
         )
+
+    def pygame_coordinate_to_square(self, pygame_position: tuple[int, int]) -> int:
+        """Convertit des coordonnées Pygame en indice de case.
+        
+        Args:
+            pygame_position: Coordonnées Pygame à convertir.
+        
+        Returns:
+            Indice de la case correspondant aux coordonnées Pygame reçues.
+        """
+        file, rank = pygame_position
+        file = BOARD_SIZE - (file // CASE_SIZE) - 1
+        rank = rank // CASE_SIZE
+
+        return rank * BOARD_SIZE + file

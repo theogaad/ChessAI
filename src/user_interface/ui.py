@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.chess_engine.game import Game
 from src.chess_engine.move import Move
-from src.chess_engine.types import Color, PieceType
+from src.chess_engine.types import Color, PieceType, EventType
 
 
 class UI(ABC):
@@ -11,6 +11,9 @@ class UI(ABC):
     Définit les opérations nécessaires à l'affichage d'une partie
     et à la récupération des coups du joueur humain.
     """
+
+    def __init__(self) -> None:
+        self.event: EventType = EventType.NONE
 
     @abstractmethod
     def display_position(self, game: Game) -> None:
@@ -21,16 +24,8 @@ class UI(ABC):
         """
 
     @abstractmethod
-    def get_move(self, game: Game) -> None:
-        """Récupère le coup joué par l'utilisateur et le transmet au moteur.
-
-        Args:
-            game: Partie en cours.
-        """
-
-    @abstractmethod
-    def quitting(self) -> bool:
-        """Indique si l'interface graphique doit être fermée."""
+    def update_event(self) -> int | None:
+        """Met à jour l'attribut event."""
 
     def piece_to_image_filename(self, color: Color, piece_type: PieceType) -> str:
         """Transforme une couleur et un type de pièce en nom de fichier d'image.

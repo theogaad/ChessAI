@@ -4,7 +4,7 @@ from src.chess_engine.move_executor import MoveExecutor
 from src.chess_engine.move_generator import MoveGenerator
 from src.chess_engine.player import Player
 from src.chess_engine.position import Position
-from src.chess_engine.types import Color, PieceType, DrawReason, GameStatus
+from src.chess_engine.types import Color, PieceType, MoveType, GameStatus, DrawReason
 from src.chess_engine.undo_info import UndoInfo
 from src.chess_engine.zobrist import Zobrist
 
@@ -138,6 +138,26 @@ class Game:
         self.history.remove_last()
         self.legal_moves = self.get_legal_moves()
         self.update_status()
+
+    def update_move_type(self, move: Move) -> Move:
+        """Retourne le move donné en mettant à jour son attribut MoveType.
+        
+        Args:
+            move: Move dont l'attribut est mis à jour.
+
+        Returns:
+            Le move avec l'attribut MoveType mis à jour.
+        """
+        updated_move: Move = move
+        
+        for move_type in MoveType:
+            updated_move.move_type = move_type
+
+            if updated_move in self.legal_moves:
+                return updated_move
+
+        return move
+
 
     def update_status(self) -> None:
         """Met à jour le statut de la partie.

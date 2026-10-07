@@ -56,3 +56,9 @@ class CastlingRights(IntFlag):
     WHITE_QUEENSIDE = 1 << 1
     BLACK_KINGSIDE = 1 << 2
     BLACK_QUEENSIDE = 1 << 3
+
+class EventType(Enum):
+    """Représente les types d'évennement possibles dans l'interface graphique."""
+    NONE = "None"
+    CLICK = "Click"
+    QUIT = "Quit"

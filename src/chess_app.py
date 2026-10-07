@@ -9,7 +9,7 @@ from src.chess_engine.move import Move
 from src.chess_engine.move_executor import MoveExecutor
 from src.chess_engine.move_generator import MoveGenerator
 from src.chess_engine.player import Player
-from src.chess_engine.types import Color, MoveType, GameStatus
+from src.chess_engine.types import Color, MoveType, GameStatus, EventType
 from src.chess_engine.zobrist import Zobrist
 from src.user_interface.pygame_ui import PygameUI
 from src.user_interface.ui import UI
@@ -72,15 +72,39 @@ class ChessApp:
         """
         self.init_ui()
         self._game_initialisation.wait()
+        first_clicked_square: int | None = None
+        second_clicked_square: int | None = None
 
         while not self._stop_running.is_set():
-            if self._ui.quitting():
-                self._stop_running.set()
-                self._ui_to_game_queue.put(None)
+            event: int | None = self._ui.update_event()
+
+            match self._ui.event:
+                case EventType.QUIT:
+                    self._stop_running.set()
+                    self._ui_to_game_queue.put(None)
+
+                case EventType.CLICK:
+                    second_clicked_square = event
+
+                    if first_clicked_square is None:
+                        first_clicked_square = second_clicked_square
+                        second_clicked_square = None
+
+                    if first_clicked_square is not None and second_clicked_square is not None:
+                        move = Move(
+                            first_clicked_square, 
+                            second_clicked_square, 
+                            MoveType.NORMAL
+                        )
+
+                        self._ui_to_game_queue.put(move)
+                        first_clicked_square = None
+                        second_clicked_square = None
+
+                case _:
+                    pass
 
             self._ui.display_position(self._game)
-
-            # TODO: Transformer les clics en Move
 
     def run_game(self) -> None:
         """Exécute la boucle principale de la partie.
@@ -100,7 +124,14 @@ class ChessApp:
             move: Move = current_player.choose_move(self._game.position, self._game.legal_moves)
 
             if move is not None:
-                self._game.make_move(move)
+                move = self._game.update_move_type(move)
+
+                try:
+                    self._game.make_move(move)
+                except ValueError as ve:
+                    print(ve.args[0])
+
+        print(self._game.status)
 
     def init_ui(self) -> None:
         """Initialise l'interface utilisateur de l'application."""
