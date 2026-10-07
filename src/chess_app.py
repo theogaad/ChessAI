@@ -21,12 +21,24 @@ class ChessApp:
     L'application exécute l'interface utilisateur et la partie dans des 
     threads distincts. Une file permet de transmettre les coups de l'interface 
     vers les joueurs humains du moteur.
+    
+    Attributes:
+        _game_thread: Thread exécutant la boucle principale de la partie.
+        _ui_to_game_queue: File utilisée pour transmettre les coups et les 
+            signaux d'arrêt de l'interface vers le moteur.
+        _game_initialisation: Événement indiquant que la partie a été 
+            initialisée et peut être utilisée par l'interface.
+        _ui_initialisation: Événement indiquant que l'interface a été 
+            initialisée et peut être utilisée par le moteur.
+        _stop_running: Événement indiquant que l'application doit arrêter 
+            son exécution.
+        _game: Partie d'échecs actuellement exécutée par l'application.
+        _ui: Interface utilisateur utilisée par l'application.
     """
 
     def __init__(self) -> None:
         """Initialise les threads, la communication et les événements de l'application."""
         self._game_thread: Thread = Thread(target=self.run_game)
-        self._ui_thread: Thread = Thread(target=self.run_ui)
 
         self._ui_to_game_queue: Queue = Queue()
         self._game_initialisation: Event = Event()
@@ -42,10 +54,9 @@ class ChessApp:
         Une fois les deux threads terminés, l'application se termine.
         """
         self._game_thread.start()
-        self._ui_thread.start()
+        self.run_ui()
 
         self._game_thread.join()
-        self._ui_thread.join()
 
         print("Partie finie :)")
 
