@@ -3,6 +3,8 @@ from src.chess_engine.types import Color, PieceType
 BOARD_SIZE: int = 8 # Nombre de cases d'un côté de l'échiquier.
 NUMBER_OF_SQUARES: int = BOARD_SIZE * BOARD_SIZE # Nombre de cases total dans l'échiquier.
 
+CASE_SIZE: int = 100 # Taille d'une case en pixels.
+
 COLOR_NUMBER: int = len(Color) # Nombre de couleurs possibles.
 PIECE_TYPE_NUMBER: int = len(PieceType) # Nombre de types de pièce possibles.
 DIFFERENT_PIECES_NUMBER: int = COLOR_NUMBER * PIECE_TYPE_NUMBER # Nombre de combinaisons (couleur, type) possibles.

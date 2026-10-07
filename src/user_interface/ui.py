@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.chess_engine.game import Game
 from src.chess_engine.move import Move
+from src.chess_engine.types import Color, PieceType
 
 
 class UI(ABC):
@@ -20,12 +21,29 @@ class UI(ABC):
         """
 
     @abstractmethod
-    def get_move(self, game: Game) -> Move:
-        """Récupère le prochain coup joué par l'utilisateur.
+    def get_move(self, game: Game) -> None:
+        """Récupère le coup joué par l'utilisateur et le transmet au moteur.
 
         Args:
             game: Partie en cours.
-
-        Returns:
-            Coup choisi par l'utilisateur.
         """
+
+    def piece_to_image_filename(self, color: Color, piece_type: PieceType) -> str:
+        color_str: str = "White" if color is Color.WHITE else "Black"
+
+        match piece_type:
+            case PieceType.KING:
+                return f"images\\pieces\\{color_str}_King.png"
+            case PieceType.QUEEN:
+                return f"images\\pieces\\{color_str}_Queen.png"
+            case PieceType.ROOK:
+                return f"images\\pieces\\{color_str}_Rook.png"
+            case PieceType.BISHOP:
+                return f"images\\pieces\\{color_str}_Bishop.png"
+            case PieceType.KNIGHT:
+                return f"images\\pieces\\{color_str}_Knight.png"
+            case PieceType.PAWN:
+                return f"images\\pieces\\{color_str}_Pawn.png"
+            
+            case _:
+                return "images\\pieces\\unknown.png"
