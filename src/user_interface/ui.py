@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from src.chess_engine.game import Game
-from src.chess_engine.move import Move
 from src.chess_engine.types import Color, PieceType, EventType
 
 
