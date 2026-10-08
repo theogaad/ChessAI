@@ -1,6 +1,7 @@
 from queue import Queue
 from threading import Thread, Event
 
+from src.chess_ai.ai_worker import AIWorker
 from src.chess_engine.ai import AI
 from src.chess_engine.attack_generator import AttackGenerator
 from src.chess_engine.constants import INITIAL_FEN
@@ -40,11 +41,15 @@ class ChessApp:
     def __init__(self) -> None:
         """Initialise les threads, la communication et les événements de l'application."""
         self._game_thread: Thread = Thread(target=self.run_game)
+        self._ai_thread: Thread = Thread(target=self.run_ai)
 
         self._ui_to_game_queue: Queue = Queue()
+        self._ai_request_queue: Queue = Queue()
+        self._ai_respond_queue: Queue = Queue()
 
         self._game_initialisation: Event = Event()
         self._ui_initialisation: Event = Event()
+        self._ai_initialisation: Event = Event()
         self._human_turn: Event = Event()
         self._ai_turn: Event = Event()
         self._stop_running: Event = Event()
@@ -58,15 +63,18 @@ class ChessApp:
         Une fois les deux threads terminés, l'application se termine.
         """
         self._game_thread.start()
+        self._ai_thread.start()
         self.run_ui()
 
         self._game_thread.join()
+        self._ai_thread.join()
 
         print("Partie finie :)")
-        self.stop()
 
     def stop(self) -> None:
         self._stop_running.set()
+        self._ai_request_queue.put(None)
+        self._ui_to_game_queue.put(None)
         self._ui.exit()
 
     def run_ui(self) -> None:
@@ -81,6 +89,7 @@ class ChessApp:
         """
         self.init_ui()
         self._game_initialisation.wait()
+        self._ai_initialisation.wait()
         first_clicked_square: int | None = None
         second_clicked_square: int | None = None
 
@@ -89,8 +98,7 @@ class ChessApp:
 
             match self._ui.event:
                 case EventType.QUIT:
-                    self._stop_running.set()
-                    self._ui_to_game_queue.put(None)
+                    self.stop()
 
                 case EventType.CLICK:
                     if self._human_turn.is_set() :
@@ -110,11 +118,10 @@ class ChessApp:
                             self._ui_to_game_queue.put(move)
                             first_clicked_square = second_clicked_square
                             second_clicked_square = None
+                    self._ui.display_position(self._game)
 
                 case _:
-                    pass
-
-            self._ui.display_position(self._game)
+                    self._ui.display_position(self._game)
 
     def run_game(self) -> None:
         """Exécute la boucle principale de la partie.
@@ -128,6 +135,7 @@ class ChessApp:
         """
         self.init_game()
         self._ui_initialisation.wait()
+        self._ai_initialisation.wait()
 
         while self._game.status == GameStatus.ONGOING and not self._stop_running.is_set():
             current_player: Player = self._game.current_player()
@@ -154,6 +162,14 @@ class ChessApp:
         elif self._game.status is GameStatus.DRAW:
             print(self._game.draw_reason)
 
+    def run_ai(self) -> None:
+        self.init_ai()
+        self._game_initialisation.wait()
+        self._ui_initialisation.wait()
+
+        while not self._stop_running.is_set():
+            self._ai.analyse_request()
+
     def init_ui(self) -> None:
         """Initialise l'interface utilisateur de l'application."""
         self._ui: UI = PygameUI()
@@ -175,8 +191,18 @@ class ChessApp:
             fen, 
             #Human(Color.WHITE, self._ui_to_game_queue), 
             #Human(Color.BLACK, self._ui_to_game_queue), 
-            AI(Color.WHITE), 
-            AI(Color.BLACK), 
+            AI(
+                Color.WHITE, 
+                self._ai_request_queue, 
+                self._ai_respond_queue, 
+                2
+            ), 
+            AI(
+                Color.BLACK, 
+                self._ai_request_queue, 
+                self._ai_respond_queue, 
+                2
+            ), 
             move_generator, 
             move_executor, 
             zobrist
@@ -185,6 +211,14 @@ class ChessApp:
         self.update_player_turn()
 
         self._game_initialisation.set()
+
+    def init_ai(self) -> None:
+        self._ai: AIWorker = AIWorker(
+            self._ai_request_queue, 
+            self._ai_respond_queue, 
+        )
+
+        self._ai_initialisation.set()
 
     def update_player_turn(self) -> None:
         if isinstance(self._game.current_player(), Human):
