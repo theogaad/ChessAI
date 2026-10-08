@@ -1,5 +1,4 @@
 from queue import Queue
-from random import choice
 
 from src.chess_ai.ai_request import AIRequest
 from src.chess_ai.search import Search
