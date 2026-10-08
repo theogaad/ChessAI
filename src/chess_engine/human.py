@@ -3,7 +3,7 @@ from queue import Queue
 from src.chess_engine.move import Move
 from src.chess_engine.player import Player
 from src.chess_engine.position import Position
-from src.chess_engine.types import Color
+from src.chess_engine.types import Color, PieceType
 
 
 class Human(Player):
@@ -46,3 +46,6 @@ class Human(Player):
             Le coup sélectionné par l'utilisateur.
         """
         return self._queue.get()
+
+    def ask_for_promotion(self) -> PieceType:
+        return PieceType.QUEEN

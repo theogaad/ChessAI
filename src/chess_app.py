@@ -183,26 +183,27 @@ class ChessApp:
         de coups, le système Zobrist et la partie initiale.
         """
         fen: str = INITIAL_FEN
+        #fen: str = "rnbqkbnr/ppppppPp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         zobrist: Zobrist = Zobrist(42)
         move_executor: MoveExecutor = MoveExecutor(zobrist)
         move_generator: MoveGenerator = MoveGenerator(AttackGenerator(), move_executor)
         
         self._game: Game = Game(
             fen, 
-            #Human(Color.WHITE, self._ui_to_game_queue), 
-            #Human(Color.BLACK, self._ui_to_game_queue), 
-            AI(
-                Color.WHITE, 
-                self._ai_request_queue, 
-                self._ai_respond_queue, 
-                2
-            ), 
-            AI(
-                Color.BLACK, 
-                self._ai_request_queue, 
-                self._ai_respond_queue, 
-                2
-            ), 
+            Human(Color.WHITE, self._ui_to_game_queue),
+            #AI(
+                #Color.WHITE, 
+                #self._ai_request_queue, 
+                #self._ai_respond_queue, 
+                #2
+            #),  
+            Human(Color.BLACK, self._ui_to_game_queue), 
+            #AI(
+                #Color.BLACK, 
+                #self._ai_request_queue, 
+                #self._ai_respond_queue, 
+                #2
+            #), 
             move_generator, 
             move_executor, 
             zobrist

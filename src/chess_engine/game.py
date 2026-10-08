@@ -1,4 +1,6 @@
+from src.chess_engine.constants import BOARD_SIZE
 from src.chess_engine.history import History
+from src.chess_engine.human import Human
 from src.chess_engine.move import Move
 from src.chess_engine.move_executor import MoveExecutor
 from src.chess_engine.move_generator import MoveGenerator
@@ -153,6 +155,22 @@ class Game:
         for move_type in MoveType:
             updated_move.move_type = move_type
 
+            square_content: tuple[Color, PieceType] | None = self.position.piece_bitboards.get_piece_at(move.start_square)
+
+            if square_content is not None:
+                color, piece_type = square_content
+                if (piece_type is PieceType.PAWN and 
+                    ((color is Color.WHITE and 
+                      move.end_square // BOARD_SIZE == 0 and 
+                      isinstance(self.white_player, Human)) or 
+                     (color is Color.BLACK and 
+                      move.end_square // BOARD_SIZE == BOARD_SIZE - 1) and 
+                      isinstance(self.black_player, Human))):
+                    if color is Color.WHITE:
+                        updated_move.promotion_piece_type = self.white_player.ask_for_promotion()
+                    else:
+                        updated_move.promotion_piece_type = self.black_player.ask_for_promotion()
+                        
             if updated_move in self.legal_moves:
                 return updated_move
 

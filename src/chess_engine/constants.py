@@ -10,6 +10,8 @@ PIECE_TYPE_NUMBER: int = len(PieceType) # Nombre de types de pièce possibles.
 DIFFERENT_PIECES_NUMBER: int = COLOR_NUMBER * PIECE_TYPE_NUMBER # Nombre de combinaisons (couleur, type) possibles.
 CASTLING_RIGHTS_NUMBER: int = 4 # Nombre de droits de roque possibles.
 
+INF: int = 1000000 # Représente l'infini
+
 BOARD_MASK: int = 0xFFFFFFFFFFFFFFFF # Masque dont les 64 bits sont à 1
 
 FILE_A: int = 0x8080808080808080 # Masque dont les bits sur la colonne A sont à 1.
