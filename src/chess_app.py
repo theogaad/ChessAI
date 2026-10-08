@@ -1,6 +1,7 @@
 from queue import Queue
 from threading import Thread, Event
 
+from src.chess_engine.ai import AI
 from src.chess_engine.attack_generator import AttackGenerator
 from src.chess_engine.constants import INITIAL_FEN
 from src.chess_engine.game import Game
@@ -41,8 +42,11 @@ class ChessApp:
         self._game_thread: Thread = Thread(target=self.run_game)
 
         self._ui_to_game_queue: Queue = Queue()
+
         self._game_initialisation: Event = Event()
         self._ui_initialisation: Event = Event()
+        self._human_turn: Event = Event()
+        self._ai_turn: Event = Event()
         self._stop_running: Event = Event()
 
     def run(self) -> None:
@@ -59,6 +63,11 @@ class ChessApp:
         self._game_thread.join()
 
         print("Partie finie :)")
+        self.stop()
+
+    def stop(self) -> None:
+        self._stop_running.set()
+        self._ui.exit()
 
     def run_ui(self) -> None:
         """Exécute la boucle principale de l'interface utilisateur.
@@ -84,22 +93,23 @@ class ChessApp:
                     self._ui_to_game_queue.put(None)
 
                 case EventType.CLICK:
-                    second_clicked_square = event
+                    if self._human_turn.is_set() :
+                        second_clicked_square = event
 
-                    if first_clicked_square is None:
-                        first_clicked_square = second_clicked_square
-                        second_clicked_square = None
+                        if first_clicked_square is None:
+                            first_clicked_square = second_clicked_square
+                            second_clicked_square = None
 
-                    if first_clicked_square is not None and second_clicked_square is not None:
-                        move = Move(
-                            first_clicked_square, 
-                            second_clicked_square, 
-                            MoveType.NORMAL
-                        )
+                        if first_clicked_square is not None and second_clicked_square is not None:
+                            move = Move(
+                                first_clicked_square, 
+                                second_clicked_square, 
+                                MoveType.NORMAL
+                            )
 
-                        self._ui_to_game_queue.put(move)
-                        first_clicked_square = None
-                        second_clicked_square = None
+                            self._ui_to_game_queue.put(move)
+                            first_clicked_square = second_clicked_square
+                            second_clicked_square = None
 
                 case _:
                     pass
@@ -121,17 +131,28 @@ class ChessApp:
 
         while self._game.status == GameStatus.ONGOING and not self._stop_running.is_set():
             current_player: Player = self._game.current_player()
+
             move: Move = current_player.choose_move(self._game.position, self._game.legal_moves)
 
             if move is not None:
-                move = self._game.update_move_type(move)
+                if self._human_turn.is_set():
+                    move = self._game.update_move_type(move)
 
                 try:
                     self._game.make_move(move)
-                except ValueError as ve:
-                    print(ve.args[0])
+
+                    self.update_player_turn()
+
+                except ValueError:
+                    pass
 
         print(self._game.status)
+
+        if self._game.status is GameStatus.CHECKMATE:
+            print(f"winner : {self._game.position.side_to_move.opposite}")
+
+        elif self._game.status is GameStatus.DRAW:
+            print(self._game.draw_reason)
 
     def init_ui(self) -> None:
         """Initialise l'interface utilisateur de l'application."""
@@ -152,11 +173,24 @@ class ChessApp:
         
         self._game: Game = Game(
             fen, 
-            Human(Color.WHITE, self._ui_to_game_queue), 
-            Human(Color.BLACK, self._ui_to_game_queue), 
+            #Human(Color.WHITE, self._ui_to_game_queue), 
+            #Human(Color.BLACK, self._ui_to_game_queue), 
+            AI(Color.WHITE), 
+            AI(Color.BLACK), 
             move_generator, 
             move_executor, 
             zobrist
         )
 
+        self.update_player_turn()
+
         self._game_initialisation.set()
+
+    def update_player_turn(self) -> None:
+        if isinstance(self._game.current_player(), Human):
+            self._human_turn.set()
+            self._ai_turn.clear()
+
+        elif isinstance(self._game.current_player(), AI):
+            self._ai_turn.set()
+            self._human_turn.clear()

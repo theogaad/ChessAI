@@ -26,6 +26,9 @@ class PygameUI(UI):
                     (CASE_SIZE, CASE_SIZE)
                 )
 
+    def exit(self) -> None:
+        pygame.quit()
+
     def display_position(self, game: Game) -> None:
         """Affiche la position actuelle de la partie.
 

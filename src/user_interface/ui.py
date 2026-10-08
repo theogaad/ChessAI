@@ -26,6 +26,10 @@ class UI(ABC):
     def update_event(self) -> int | None:
         """Met à jour l'attribut event."""
 
+    @abstractmethod
+    def exit(self) -> None:
+        """Ferme l'interface graphique."""
+
     def piece_to_image_filename(self, color: Color, piece_type: PieceType) -> str:
         """Transforme une couleur et un type de pièce en nom de fichier d'image.
         
