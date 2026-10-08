@@ -2,6 +2,7 @@ from queue import Queue
 from random import choice
 
 from src.chess_ai.ai_request import AIRequest
+from src.chess_ai.search import Search
 from src.chess_engine.move import Move
 
 
@@ -9,6 +10,7 @@ class AIWorker():
     def __init__(self, ai_request: Queue, ai_response: Queue) -> None:
         self._ai_request_queue: Queue = ai_request
         self._ai_response_queue: Queue = ai_response
+        self._search: Search = Search()
 
     def analyse_request(self) -> None:
         ai_request: AIRequest | None = self.get_request()
@@ -17,7 +19,7 @@ class AIWorker():
             self.respond(ai_request)
             return
 
-        move: Move = choice(ai_request.legal_moves)
+        move: Move | None = self._search.find_best_move(ai_request)
 
         self.respond(move)
 
