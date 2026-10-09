@@ -154,13 +154,13 @@ class ChessApp:
                 except ValueError:
                     pass
 
-        print(self._game.status)
+        print(self._game.status.name)
 
         if self._game.status is GameStatus.CHECKMATE:
-            print(f"winner : {self._game.position.side_to_move.opposite}")
+            print(f"winner : {self._game.position.side_to_move.opposite.name}")
 
-        elif self._game.status is GameStatus.DRAW:
-            print(self._game.draw_reason)
+        elif self._game.status is GameStatus.DRAW and self._game.draw_reason is not None:
+            print(self._game.draw_reason.name)
 
     def run_ai(self) -> None:
         self.init_ai()
@@ -190,20 +190,10 @@ class ChessApp:
         
         self._game: Game = Game(
             fen, 
-            Human(Color.WHITE, self._ui_to_game_queue),
-            #AI(
-                #Color.WHITE, 
-                #self._ai_request_queue, 
-                #self._ai_respond_queue, 
-                #2
-            #),  
-            Human(Color.BLACK, self._ui_to_game_queue), 
-            #AI(
-                #Color.BLACK, 
-                #self._ai_request_queue, 
-                #self._ai_respond_queue, 
-                #2
-            #), 
+            #Human(Color.WHITE, self._ui_to_game_queue),
+            AI(Color.WHITE, self._ai_request_queue, self._ai_respond_queue, 1),  
+            #Human(Color.BLACK, self._ui_to_game_queue), 
+            AI(Color.BLACK, self._ai_request_queue, self._ai_respond_queue, 1), 
             move_generator, 
             move_executor, 
             zobrist

@@ -1,4 +1,5 @@
 from queue import Queue
+from random import choice
 
 from src.chess_engine.move import Move
 from src.chess_engine.player import Player
@@ -45,6 +46,7 @@ class Human(Player):
         Returns:
             Le coup sélectionné par l'utilisateur.
         """
+        return choice(legal_moves)
         return self._queue.get()
 
     def ask_for_promotion(self) -> PieceType:

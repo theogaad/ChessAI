@@ -46,6 +46,8 @@ class Search:
     ) -> list[Move]:
         best_moves: list[Move] = []
         best_move_value: int = -INF
+        alpha: int = -INF
+        beta: int = INF
 
         for move in legal_moves:
             undo_info: UndoInfo = self._move_executor.make_move(position, move)
@@ -53,7 +55,9 @@ class Search:
             move_value: int = - self.negamax_recursive(
                 position, 
                 self._move_generator.generate_legal_moves(position), 
-                depth - 1
+                depth - 1, 
+                -alpha, 
+                -beta
             )
 
             self._move_executor.undo_move(position, move, undo_info)
@@ -73,6 +77,8 @@ class Search:
         position: Position, 
         legal_moves: list[Move], 
         depth: int, 
+        alpha: int, 
+        beta: int
     ) -> int:
         if len(legal_moves) == 0:
             if self._move_generator._attack_generator.is_king_in_check(position, position.side_to_move):
@@ -93,10 +99,16 @@ class Search:
                     position, 
                     self._move_generator.generate_legal_moves(position), 
                     depth - 1, 
+                    -alpha, 
+                    -beta
                 )
     
                 self._move_executor.undo_move(position, move, undo_info)
 
                 best_value = max(best_value, move_value)
+                alpha = max(alpha, move_value)
+
+                if alpha >= beta:
+                    break
 
             return best_value
