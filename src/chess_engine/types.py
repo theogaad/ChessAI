@@ -26,6 +26,14 @@ class PieceType(Enum):
     KNIGHT = 4
     PAWN = 5
 
+class PieceValue(Enum):
+    KING = 0
+    QUEEN = 13
+    ROOK = 5
+    BISHOP = 3
+    KNIGHT = 3
+    PAWN = 1
+
 class MoveType(Enum):
     """Représente le type d'un coup aux échecs."""
 

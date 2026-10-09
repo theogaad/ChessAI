@@ -144,7 +144,9 @@ class MoveGenerator:
                         pseudo_legal_moves.append(Move(
                             square, 
                             position.en_passant_square, 
-                            MoveType.EN_PASSANT
+                            MoveType.EN_PASSANT, 
+                            None, 
+                            position.piece_bitboards.get_piece_at(position.en_passant_square - coeff * BOARD_SIZE)[1]
                         ))
 
             ally_pieces: int = (position.piece_bitboards.white_pieces 
@@ -156,6 +158,12 @@ class MoveGenerator:
             while pseudo_legal_squares != 0:
                 pseudo_legal_square: int = pseudo_legal_squares.bit_length() - 1
 
+                captured_piece: PieceType | None = None
+                end_square_content: tuple[Color, PieceType] | None = position.piece_bitboards.get_piece_at(pseudo_legal_square)
+
+                if end_square_content is not None:
+                    captured_piece = end_square_content[1]
+
                 if (piece_type is PieceType.PAWN and (
                     (color is Color.WHITE and pseudo_legal_square // BOARD_SIZE == 0) or
                     (color is Color.BLACK and pseudo_legal_square // BOARD_SIZE == BOARD_SIZE - 1)
@@ -165,14 +173,17 @@ class MoveGenerator:
                             square, 
                             pseudo_legal_square, 
                             MoveType.NORMAL, 
-                            promotion_type
+                            promotion_type, 
+                            captured_piece
                         ))
 
                 else:
                     pseudo_legal_moves.append(Move(
                         square, 
                         pseudo_legal_square, 
-                        MoveType.NORMAL
+                        MoveType.NORMAL, 
+                        None, 
+                        captured_piece
                     ))
 
                 pseudo_legal_squares &= ~(1 << pseudo_legal_square)

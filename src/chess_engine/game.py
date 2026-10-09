@@ -170,7 +170,14 @@ class Game:
                         updated_move.promotion_piece_type = self.white_player.ask_for_promotion()
                     else:
                         updated_move.promotion_piece_type = self.black_player.ask_for_promotion()
-                        
+
+                end_square_content: tuple[Color, PieceType] | None = self.position.piece_bitboards.get_piece_at(
+                    move.end_square
+                )
+
+                if end_square_content is not None:
+                    updated_move.capture_piece = end_square_content[1]
+
             if updated_move in self.legal_moves:
                 return updated_move
 

@@ -21,5 +21,6 @@ class Move:
 
     start_square: int
     end_square: int
-    move_type: MoveType
+    move_type: MoveType = MoveType.NORMAL
     promotion_piece_type: PieceType | None = None
+    capture_piece: PieceType | None = None

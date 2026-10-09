@@ -1,5 +1,7 @@
+from enum import Enum
+
 from src.chess_engine.position import Position
-from src.chess_engine.types import Color, PieceType
+from src.chess_engine.types import Color, PieceType, PieceValue
 
 
 class Evaluation:
@@ -14,15 +16,15 @@ class Evaluation:
                 piece_value: int = 0
                 match piece_type:
                     case PieceType.QUEEN:
-                        piece_value = 13
+                        piece_value = PieceValue.QUEEN.value
                     case PieceType.ROOK:
-                        piece_value = 5
+                        piece_value = PieceValue.ROOK.value
                     case PieceType.BISHOP:
-                        piece_value = 3
+                        piece_value = PieceValue.BISHOP.value
                     case PieceType.KNIGHT:
-                        piece_value = 3
+                        piece_value = PieceValue.KNIGHT.value
                     case PieceType.PAWN:
-                        piece_value = 1
+                        piece_value = PieceValue.PAWN.value
                     case _:
                         pass
 

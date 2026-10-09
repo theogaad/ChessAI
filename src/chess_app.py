@@ -190,10 +190,10 @@ class ChessApp:
         
         self._game: Game = Game(
             fen, 
-            #Human(Color.WHITE, self._ui_to_game_queue),
-            AI(Color.WHITE, self._ai_request_queue, self._ai_respond_queue, 1),  
-            #Human(Color.BLACK, self._ui_to_game_queue), 
-            AI(Color.BLACK, self._ai_request_queue, self._ai_respond_queue, 1), 
+            Human(Color.WHITE, self._ui_to_game_queue),
+            #AI(Color.WHITE, self._ai_request_queue, self._ai_respond_queue, 2),  
+            Human(Color.BLACK, self._ui_to_game_queue), 
+            #AI(Color.BLACK, self._ai_request_queue, self._ai_respond_queue, 2), 
             move_generator, 
             move_executor, 
             zobrist
